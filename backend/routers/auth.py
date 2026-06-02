@@ -1,11 +1,18 @@
 import hashlib
+import re
 import uuid
 from datetime import datetime, timedelta, timezone
 
 import bcrypt
 from fastapi import APIRouter, Depends, HTTPException
 from jose import jwt, JWTError
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
+
+from ratelimit import rate_limit
+
+# Pragmatic email shape check — avoids pulling in the `email-validator` dependency
+# while still rejecting obviously-malformed addresses (AUDIT P1 validation gap).
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 from database.db import (
     DEFAULT_USER_ID,
@@ -13,6 +20,7 @@ from database.db import (
     get_active_refresh_token,
     get_user_by_email,
     get_user_by_id,
+    purge_expired_refresh_tokens,
     revoke_refresh_token,
     set_user_password_hash,
     store_refresh_token,
@@ -89,17 +97,30 @@ class RegisterBody(BaseModel):
     email: str
     password: str
 
+    @field_validator("email")
+    @classmethod
+    def _valid_email(cls, v: str) -> str:
+        v = v.strip().lower()
+        if not _EMAIL_RE.match(v):
+            raise ValueError("Enter a valid email address.")
+        return v
+
 
 class LoginBody(BaseModel):
     email: str
     password: str
+
+    @field_validator("email")
+    @classmethod
+    def _normalize_email(cls, v: str) -> str:
+        return v.strip().lower()
 
 
 class RefreshBody(BaseModel):
     refresh_token: str
 
 
-@router.post("/auth/register")
+@router.post("/auth/register", dependencies=[Depends(rate_limit("auth"))])
 def register(body: RegisterBody):
     if len(body.name.strip()) < 2:
         raise HTTPException(status_code=400, detail="Name must be at least 2 characters.")
@@ -112,7 +133,7 @@ def register(body: RegisterBody):
     return _issue_tokens(user_id, body.email, name)
 
 
-@router.post("/auth/login")
+@router.post("/auth/login", dependencies=[Depends(rate_limit("auth"))])
 def login(body: LoginBody):
     user = get_user_by_email(body.email)
     if not user:
@@ -140,6 +161,9 @@ def refresh(body: RefreshBody):
     if not get_active_refresh_token(token_hash):
         raise HTTPException(status_code=401, detail="Refresh token revoked or expired.")
     revoke_refresh_token(token_hash)
+    # Opportunistic cleanup so the refresh_tokens table doesn't grow forever
+    # (AUDIT P0-5). Cheap, runs on the natural refresh cadence.
+    purge_expired_refresh_tokens()
 
     user = get_user_by_id(user_id)
     if not user:

@@ -12,6 +12,7 @@
   "dependencies": {
     "@types/marked": "^5.0.2",
     "clsx": "^2.1.1",
+    "dompurify": "^3.4.7",
     "framer-motion": "^11.0.0",
     "lucide-react": "^0.441.0",
     "mammoth": "^1.8.0",

@@ -1,0 +1,16 @@
+# Minimal dependency set to run the backend + intelligence test suites.
+# Excludes torch/sentence-transformers because the tests skip the embedding
+# warm-up (DORY_SKIP_WARMUP=1) and stub embeddings, so the heavy ML stack is not
+# needed for CI. This set is what was used to verify 45 passing tests on
+# Python 3.14.5 locally; it also installs cleanly on 3.11–3.13.
+fastapi
+pydantic>=2
+httpx
+pytest
+python-jose[cryptography]
+bcrypt
+python-multipart
+numpy
+python-docx
+fsrs
+chromadb

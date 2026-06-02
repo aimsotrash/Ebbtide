@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Query
 
 import numpy as np
 
-from core.decay_engine import calculate_retention_batch, classify_retention
+from intelligence.memory import calculate_retention_batch, classify_retention
 from database.db import get_all_chunks
 from models.schemas import CategoryHealth, HealthResponse
 from routers._shared import parse_dt

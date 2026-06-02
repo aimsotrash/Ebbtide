@@ -3,10 +3,13 @@ from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from core.decay_engine import calculate_retention
+from intelligence.memory import calculate_retention
+from intelligence.llm import FALLBACK_QUESTIONS, difficulty, generate_mcq
 from database.db import (
+    complete_quiz_session,
     create_quiz_session,
     get_lowest_retention_chunks,
+    get_quiz_history,
     update_chunk_access_by,
 )
 from models.schemas import (
@@ -19,101 +22,30 @@ from models.schemas import (
     QuizResultItem,
 )
 from routers.deps import get_current_user_id
-from services.llm_service import get_llm
 
 # In-memory store: {session_id: {question_id: {correct_index, chunk_id}}}
-# Process-scoped, fine for hackathon
+# Process-scoped — see AUDIT P0-3 for the multi-worker limitation.
 _session_store: dict[str, dict[str, dict]] = {}
+
+# Fallback questions live in the intelligence layer (degrade gracefully w/o an LLM).
+_FALLBACK_QUESTIONS = FALLBACK_QUESTIONS
 
 router = APIRouter()
 
-# Fallback questions used if LLM is unavailable
-_FALLBACK_QUESTIONS = [
-    {
-        "question": "What is the primary purpose of spaced repetition?",
-        "options": [
-            "To memorize information faster in one session",
-            "To review information at increasing intervals to strengthen memory",
-            "To organize notes by topic",
-            "To summarize long documents automatically",
-        ],
-        "correct_index": 1,
-    },
-    {
-        "question": "According to Ebbinghaus, how much information is forgotten after one week without review?",
-        "options": ["~10%", "~25%", "~75%", "~99%"],
-        "correct_index": 2,
-    },
-    {
-        "question": "What does the stability factor S represent in the decay formula?",
-        "options": [
-            "The size of the document",
-            "How often a chunk was reviewed (durability of memory)",
-            "The complexity of the content",
-            "The time since the note was created",
-        ],
-        "correct_index": 1,
-    },
-    {
-        "question": "Which retention score range is classified as 'Critical' in Dory.md?",
-        "options": ["0.8 – 1.0", "0.5 – 0.8", "0.2 – 0.5", "0.0 – 0.2"],
-        "correct_index": 3,
-    },
-    {
-        "question": "What does the Time Machine slider project?",
-        "options": [
-            "The history of your notes",
-            "Future knowledge retention using the decay formula",
-            "Your weekly study schedule",
-            "The similarity between documents",
-        ],
-        "correct_index": 1,
-    },
-]
-
-_MCQ_SYSTEM = (
-    "You are a quiz generator. Given a text chunk, generate exactly 1 multiple-choice question "
-    "that tests understanding of the content. Return ONLY valid JSON with this exact structure: "
-    '{"question": "...", "options": ["A. ...", "B. ...", "C. ...", "D. ..."], "correct_index": 0} '
-    "where correct_index is 0-based. No markdown, no explanation."
-)
-
-
-def _difficulty(complexity_score: float) -> str:
-    if complexity_score < 0.33:
-        return "easy"
-    if complexity_score < 0.66:
-        return "medium"
-    return "hard"
-
 
 def _generate_question(chunk_id: str, content: str, access_count: int, complexity_score: float, source_file: str, category: str, fallback_q: dict) -> QuizQuestion:
-    last_accessed = datetime.now(tz=timezone.utc)
-    r = calculate_retention(last_accessed, access_count, complexity_score)
-
-    llm = get_llm()
-    result = llm.complete_json(
-        prompt=f"Generate a quiz question for this text:\n\n{content[:600]}",
-        system=_MCQ_SYSTEM,
-        fallback=fallback_q,
-    )
-
-    question = result.get("question", fallback_q["question"])
-    options = result.get("options", fallback_q["options"])
-    correct_index = int(result.get("correct_index", fallback_q["correct_index"]))
-
-    if not isinstance(options, list) or len(options) < 2:
-        options = fallback_q["options"]
-        correct_index = fallback_q["correct_index"]
-    correct_index = max(0, min(correct_index, len(options) - 1))
-
+    """Compose the API quiz-question shape. The MCQ text/options come from the
+    intelligence layer; retention/difficulty are derived from the memory model.
+    The backend owns only the wire-shape mapping."""
+    r = calculate_retention(datetime.now(tz=timezone.utc), access_count, complexity_score)
+    mcq = generate_mcq(content, fallback_q)
     return QuizQuestion(
         id=chunk_id,
         chunk_id=chunk_id,
-        question=question,
-        options=options,
-        correct_index=correct_index,
-        difficulty=_difficulty(complexity_score),
+        question=mcq["question"],
+        options=mcq["options"],
+        correct_index=mcq["correct_index"],
+        difficulty=difficulty(complexity_score),
         category=category or "general",
         retention=round(r, 4),
         source_file=source_file,
@@ -170,9 +102,19 @@ def start_quiz(user_id: str = Depends(get_current_user_id)):
 
 @router.post("/quiz/answer", response_model=QuizAnswerResponse)
 def submit_answer(body: QuizAnswerRequest, user_id: str = Depends(get_current_user_id)):
-    correct = body.selected_index == body.correct_index
+    # Server-authoritative scoring (AUDIT P0-4): the correct answer is looked up
+    # from the server-side session map, never trusted from the request body. The
+    # client-supplied correct_index is only a fallback for a session the server
+    # has lost (e.g. after a restart), and even then it cannot grant a reward.
+    session = _session_store.get(body.session_id, {})
+    meta = session.get(body.chunk_id)
+    server_known = meta is not None
+    correct_index = meta["correct_index"] if server_known else body.correct_index
+    correct = body.selected_index == correct_index
     new_r = 0.0
-    if correct and not body.chunk_id.startswith("fallback-"):
+    # Only a server-verified correct answer earns a retention reward, so a client
+    # cannot farm access_count by replaying answers against a lost/forged session.
+    if correct and server_known and not body.chunk_id.startswith("fallback-"):
         updated = update_chunk_access_by(body.chunk_id, delta=2, user_id=user_id, source="quiz")
         if updated is not None:
             last_accessed = datetime.now(tz=timezone.utc)
@@ -180,7 +122,7 @@ def submit_answer(body: QuizAnswerRequest, user_id: str = Depends(get_current_us
 
     return QuizAnswerResponse(
         correct=correct,
-        correct_index=body.correct_index,
+        correct_index=correct_index,
         new_retention=round(new_r, 4),
         message="Memory revived!" if correct else "Keep reviewing — you'll get it next time.",
     )
@@ -224,6 +166,11 @@ def submit_quiz(session_id: str, body: QuizSubmitRequest, user_id: str = Depends
             stability_delta=stability_delta,
         ))
 
+    # Persist the finished session so it shows up in history (AUDIT P0-2).
+    complete_quiz_session(session_id, score, user_id)
+    # Free the in-memory answer key now that the session is scored.
+    _session_store.pop(session_id, None)
+
     return QuizSubmitResponse(
         session_id=session_id,
         score=score,
@@ -232,3 +179,22 @@ def submit_quiz(session_id: str, body: QuizSubmitRequest, user_id: str = Depends
         xp_earned=score * 50,
         streaks=max_streak,
     )
+
+
+@router.get("/quiz/history")
+def quiz_history(user_id: str = Depends(get_current_user_id)):
+    """Return the user's completed quiz sessions, most recent first."""
+    rows = get_quiz_history(user_id, limit=20)
+    return {
+        "sessions": [
+            {
+                "session_id": r["id"],
+                "started_at": r["started_at"],
+                "completed_at": r["completed_at"],
+                "correct_count": r["correct_count"],
+                "total_count": r["total_count"],
+                "accuracy": round(r["correct_count"] / r["total_count"], 4) if r["total_count"] else 0.0,
+            }
+            for r in rows
+        ]
+    }

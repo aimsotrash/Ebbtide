@@ -77,7 +77,8 @@ export function LibraryPage() {
   useEffect(() => {
     const fromUrl = searchParams.get('chunk');
     if (fromUrl && fromUrl !== activeChunkId) setActiveChunkId(fromUrl);
-  }, [searchParams]);
+    // Intentionally keyed only on the URL → state direction.
+  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const fromUrl = searchParams.get('chunk');
@@ -94,7 +95,8 @@ export function LibraryPage() {
         return next;
       }, { replace: true });
     }
-  }, [activeChunkId]);
+    // Intentionally keyed only on the state → URL direction.
+  }, [activeChunkId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const activeChunk = chunks.find((c) => c.chunk_id === activeChunkId) ?? null;
 

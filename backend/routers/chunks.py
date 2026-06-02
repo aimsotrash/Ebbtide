@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from core.decay_engine import calculate_retention, classify_retention
+import logging
+
+from intelligence.memory import calculate_retention, classify_retention
 from database.db import (
     delete_chunk,
     get_all_chunks,
@@ -19,9 +21,27 @@ from models.schemas import (
 )
 from routers._shared import parse_dt, time_ago
 from routers.deps import get_current_user_id
-from services.chroma_service import delete_chunk as chroma_delete
+from intelligence.retrieval import delete_chunk as chroma_delete
+from intelligence.retrieval import upsert_chunk as chroma_upsert
+
+logger = logging.getLogger("dory.chunks")
 
 router = APIRouter()
+
+
+def _reindex_chunk(chunk_id: str, content: str, user_id: str, source_file: str) -> bool:
+    """Recompute the embedding for an edited chunk and upsert it into the vector
+    store so semantic search reflects the new text (AUDIT P0-1). Returns True on
+    success. Failures are logged, not raised — the SQLite content is already saved,
+    and a failed re-index is recoverable, but it must be observable."""
+    try:
+        from intelligence.embeddings import embed_query  # heavy import: defer to call time
+        embedding = embed_query(content)
+        chroma_upsert(chunk_id, embedding, {"user_id": user_id, "chunk_id": chunk_id, "source_file": source_file})
+        return True
+    except Exception:
+        logger.exception("Failed to re-index chunk %s after edit; vector is now stale", chunk_id)
+        return False
 
 
 @router.get("/chunks", response_model=ChunksResponse)
@@ -79,10 +99,13 @@ def get_chunk_detail(chunk_id: str, user_id: str = Depends(get_current_user_id))
 
 @router.put("/chunks/{chunk_id}")
 def update_chunk(chunk_id: str, body: UpdateChunkRequest, user_id: str = Depends(get_current_user_id)):
-    """Update chunk content (used by inline editor)."""
+    """Update chunk content (used by inline editor). Re-embeds the chunk so the
+    vector store stays consistent with the edited text."""
     if not update_chunk_content(chunk_id, body.content, user_id):
         raise HTTPException(status_code=404, detail="Chunk not found")
-    return {"updated": chunk_id}
+    row = get_chunk_full(chunk_id, user_id)
+    reindexed = _reindex_chunk(chunk_id, body.content, user_id, row["source_file"] if row else "") if row else False
+    return {"updated": chunk_id, "reindexed": reindexed}
 
 
 @router.delete("/chunks/{chunk_id}")

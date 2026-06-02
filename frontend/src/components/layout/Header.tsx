@@ -1,8 +1,9 @@
-import { Brain, Bell, Plus, Upload, X } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { Brain, Bell, Plus, Upload, X, Menu, Settings } from 'lucide-react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { ingestText } from '@/lib/api';
 import { UploadModal } from '@/components/upload/UploadModal';
+import { navGroups } from './navConfig';
 
 interface HeaderProps {
   hasDiscovery?: boolean;
@@ -26,8 +27,12 @@ export function Header({ hasDiscovery, onDiscoveryClick }: HeaderProps) {
   const [ingestContent, setIngestContent] = useState('');
   const [ingesting, setIngesting] = useState(false);
   const [ingestSuccess, setIngestSuccess] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const location = useLocation();
   const meta = pageMeta[location.pathname] ?? pageMeta['/'];
+
+  // Close the mobile nav whenever the route changes.
+  useEffect(() => { setMobileNavOpen(false); }, [location.pathname]);
 
   async function handleIngest() {
     if (!ingestContent.trim()) return;
@@ -49,6 +54,15 @@ export function Header({ hasDiscovery, onDiscoveryClick }: HeaderProps) {
     <>
       <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-[var(--border)] bg-[rgba(255,253,248,0.92)] px-4 backdrop-blur md:px-6">
         <div className="flex min-w-0 items-center gap-4">
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen(true)}
+            className="btn-ghost h-9 w-9 p-0 md:hidden"
+            aria-label="Open navigation menu"
+            aria-expanded={mobileNavOpen}
+          >
+            <Menu size={18} />
+          </button>
           <Link to="/" className="flex shrink-0 items-center gap-2">
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--accent)] text-white">
               <Brain size={18} />
@@ -75,12 +89,67 @@ export function Header({ hasDiscovery, onDiscoveryClick }: HeaderProps) {
             onClick={onDiscoveryClick}
             className="btn-ghost relative h-9 w-9 p-0"
             title="Discovery notifications"
+            aria-label={hasDiscovery ? 'Discovery notifications (new)' : 'Discovery notifications'}
           >
             <Bell size={16} />
             {hasDiscovery && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[var(--warn)]" />}
           </button>
         </div>
       </header>
+
+      {/* Mobile navigation drawer — the sidebar is desktop-only, so this is the
+          sole way to navigate on phones (UI_REVIEW U-1). */}
+      {mobileNavOpen && (
+        <div
+          className="fixed inset-0 z-50 md:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation"
+          onClick={(e) => { if (e.target === e.currentTarget) setMobileNavOpen(false); }}
+        >
+          <div className="absolute inset-0 bg-black/35" />
+          <nav className="absolute left-0 top-0 h-full w-72 max-w-[80vw] overflow-y-auto border-r border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow)]">
+            <div className="mb-4 flex items-center justify-between">
+              <span className="flex items-center gap-2 font-bold text-[var(--text-1)]">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--accent)] text-white">
+                  <Brain size={16} />
+                </span>
+                Dory.md
+              </span>
+              <button type="button" onClick={() => setMobileNavOpen(false)} className="btn-ghost h-8 w-8 p-0" aria-label="Close navigation menu">
+                <X size={16} />
+              </button>
+            </div>
+            <div className="space-y-5">
+              {navGroups.map((group) => (
+                <div key={group.label}>
+                  <p className="app-label mb-2 px-2">{group.label}</p>
+                  <div className="space-y-1">
+                    {group.items.map(({ to, label, icon: Icon, exact }) => (
+                      <NavLink
+                        key={to}
+                        to={to}
+                        end={exact}
+                        className={({ isActive }) => (isActive ? 'nav-item-active' : 'nav-item')}
+                      >
+                        <Icon size={17} />
+                        <span>{label}</span>
+                      </NavLink>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <div>
+                <p className="app-label mb-2 px-2">Account</p>
+                <NavLink to="/settings" className={({ isActive }) => (isActive ? 'nav-item-active' : 'nav-item')}>
+                  <Settings size={17} />
+                  <span>Settings</span>
+                </NavLink>
+              </div>
+            </div>
+          </nav>
+        </div>
+      )}
 
       {showIngest && (
         <div

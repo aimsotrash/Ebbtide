@@ -7,8 +7,8 @@ from fastapi import APIRouter, Depends
 
 from database.db import get_all_chunks, insert_chunk, update_chunk_category
 from routers.deps import get_current_user_id
-from core.embeddings import embed_texts
-from services.chroma_service import add_chunks
+from intelligence.embeddings import embed_texts
+from intelligence.retrieval import add_chunks
 
 router = APIRouter()
 

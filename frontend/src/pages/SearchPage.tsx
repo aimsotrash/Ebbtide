@@ -8,6 +8,7 @@ import type { SearchResult } from '@/lib/types';
 import { Search, Star, FileText, Activity } from 'lucide-react';
 import { retentionToColor, categoryColors, retentionToLabel } from '@/styles/theme';
 import { formatRetentionPct, cn } from '@/lib/utils';
+import { sanitizeHtml } from '@/lib/sanitize';
 import type { Category } from '@/lib/types';
 
 function baseName(path: string) {
@@ -54,6 +55,11 @@ export function SearchPage() {
       setSearched(true);
       setActiveResult(res.results[0] ?? null);
     } catch (e) {
+      // Clear stale results so the error banner isn't shown alongside the
+      // previous query's hits (UI_REVIEW U-3).
+      setResults([]);
+      setSearched(true);
+      setActiveResult(null);
       setError(e instanceof Error ? e.message : 'Search failed');
     } finally {
       setLoading(false);
@@ -61,9 +67,10 @@ export function SearchPage() {
   }, [setSearchParams]);
 
   useEffect(() => {
+    // Run once on mount to honor a ?q= deep-link; intentionally not re-run.
     const q = searchParams.get('q');
     if (q && !searched) void handleSearch(q);
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Layout: single full-width column when no result is active; split layout (results | detail) once the user clicks something.
   const hasDetail = activeResult !== null;
@@ -123,7 +130,7 @@ export function SearchPage() {
                   )}
                 </div>
                 <p className="line-clamp-3 text-sm leading-relaxed text-[var(--text-2)]">
-                  {result.highlight ? <span dangerouslySetInnerHTML={{ __html: result.highlight }} /> : result.chunk.content}
+                  {result.highlight ? <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(result.highlight) }} /> : result.chunk.content}
                 </p>
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   <span className="tag capitalize" style={{ color: catColor, borderColor: `${catColor}44`, background: `${catColor}14` }}>

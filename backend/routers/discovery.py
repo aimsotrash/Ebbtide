@@ -6,7 +6,7 @@ Returns {has_discovery: false} when nothing warrants a notification.
 
 from fastapi import APIRouter, Depends
 
-from core.decay_engine import calculate_retention
+from intelligence.memory import calculate_retention
 from database.db import get_all_chunks
 from routers._shared import parse_dt, to_chunk_full
 from routers.deps import get_current_user_id

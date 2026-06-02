@@ -1,15 +1,15 @@
-import math
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from core.decay_engine import calculate_retention, classify_retention
-from core.embeddings import embed_query
+from intelligence.memory import calculate_retention, classify_retention
+from intelligence.embeddings import embed_query
+from intelligence.ranking import composite_score, recency_bonus
+from intelligence.retrieval import query_similar
 from database.db import get_chunk
 from models.schemas import SearchRequest, SearchResponse, SearchResult
 from routers._shared import parse_dt, time_ago, to_chunk_full
 from routers.deps import get_current_user_id
-from services.chroma_service import query_similar
 
 router = APIRouter()
 
@@ -18,7 +18,7 @@ def _recency_bonus(created_at: str) -> float:
     """Exponential decay of 'how recent' the chunk is, used as a small ranking signal."""
     dt = parse_dt(created_at)
     days = (datetime.now(tz=timezone.utc) - dt).days
-    return math.exp(-days / 30)
+    return recency_bonus(days)
 
 
 @router.post("/search", response_model=SearchResponse)
@@ -39,9 +39,8 @@ def context_search(body: SearchRequest, user_id: str = Depends(get_current_user_
             continue
         last_accessed = parse_dt(row["last_accessed"])
         r = calculate_retention(last_accessed, row["access_count"], row["complexity_score"])
-        decay_urgency = 1.0 - r
         recency = _recency_bonus(row["created_at"])
-        composite = (sim * 0.4) + (decay_urgency * 0.4) + (recency * 0.2)
+        composite = composite_score(sim, r, recency)
         scored.append((composite, r, dict(row)))
 
     scored.sort(key=lambda x: x[0], reverse=True)
@@ -102,9 +101,8 @@ def search_get(
             continue
         last_accessed = parse_dt(row["last_accessed"])
         r = calculate_retention(last_accessed, row["access_count"], row["complexity_score"])
-        decay_urgency = 1.0 - r
         recency = _recency_bonus(row["created_at"])
-        composite = (sim * 0.4) + (decay_urgency * 0.4) + (recency * 0.2)
+        composite = composite_score(sim, r, recency)
         scored.append((composite, r, dict(row), sim))
 
     scored.sort(key=lambda x: x[0], reverse=True)

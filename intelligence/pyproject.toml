@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dory-intelligence"
+version = "1.0.0"
+description = "Dory.md intelligence layer: memory-science, retrieval, ranking, and LLM logic as an independent domain package."
+requires-python = ">=3.11"
+dependencies = [
+    "numpy",
+    "fsrs",
+    # Optional/heavy extras pulled in lazily by the relevant subpackages:
+    #   embeddings -> sentence-transformers, torch
+    #   retrieval  -> chromadb
+    #   llm        -> groq | openai | anthropic
+    # They are intentionally not hard deps so a consumer can install only the
+    # subsystems it needs.
+]
+
+[project.optional-dependencies]
+embeddings = ["sentence-transformers", "torch"]
+retrieval = ["chromadb"]
+llm = ["groq", "openai", "anthropic"]
+all = ["sentence-transformers", "torch", "chromadb", "groq", "openai", "anthropic"]
+
+[tool.setuptools]
+packages = [
+    "intelligence",
+    "intelligence.memory",
+    "intelligence.embeddings",
+    "intelligence.retrieval",
+    "intelligence.ranking",
+    "intelligence.llm",
+    "intelligence.domain",
+]
+package-dir = { "intelligence" = "." }

@@ -8,7 +8,7 @@ import pytest
 from datetime import datetime, timedelta, timezone
 
 from database.db import insert_chunk, get_chunk
-from services import scheduler_service
+from intelligence.memory import scheduler as scheduler_service
 
 
 def _seed_chunk(user_id: str, content: str = "FSRS test note") -> str:

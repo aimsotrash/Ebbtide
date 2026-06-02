@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Query
 
-from core.decay_engine import calculate_retention, classify_retention
+from intelligence.memory import calculate_retention, classify_retention
 from database.db import get_all_chunks
 from models.schemas import ChunkOut, FadingResponse
 from routers._shared import parse_dt, time_ago

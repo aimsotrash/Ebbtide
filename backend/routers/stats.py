@@ -1,7 +1,7 @@
 import numpy as np
 from fastapi import APIRouter, Depends
 
-from core.decay_engine import calculate_retention
+from intelligence.memory import calculate_retention
 from database.db import get_all_chunks
 from models.schemas import StatsResponse
 from routers._shared import parse_dt

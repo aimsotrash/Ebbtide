@@ -9,9 +9,11 @@ from pathlib import Path
 
 import pytest
 
-# Add backend/ to path so `from main import app` works.
+# Add backend/ to path so `from main import app` works, and the repo root so the
+# sibling `intelligence/` package is importable.
 BACKEND_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(BACKEND_ROOT))
+sys.path.insert(0, str(BACKEND_ROOT.parent))
 
 # Set env vars BEFORE importing the app. The DORY_DB_PATH value here is a
 # placeholder; the per-test client fixture rewrites it.

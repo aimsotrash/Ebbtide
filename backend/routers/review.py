@@ -11,7 +11,8 @@ from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from core.decay_engine import calculate_retention
+from intelligence.memory import calculate_retention
+from intelligence.memory import VALID_GRADES, grade as fsrs_grade
 from database.db import (
     apply_fsrs_update,
     count_due_chunks,
@@ -27,7 +28,6 @@ from models.schemas import (
     ReviewResponse,
 )
 from routers.deps import get_current_user_id
-from services.scheduler_service import VALID_GRADES, grade as fsrs_grade
 
 router = APIRouter()
 

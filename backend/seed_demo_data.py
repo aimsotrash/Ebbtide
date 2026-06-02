@@ -18,13 +18,14 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-# Allow running from backend/ directory
+# Allow running from backend/ directory, and make the sibling intelligence/ package importable.
 sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from database.db import init_db, insert_chunk
-from core import chunker, complexity
-from core.embeddings import embed_texts, warm_model
-from services.chroma_service import add_chunks
+from intelligence.domain import chunk_text as _chunk_text, complexity_score
+from intelligence.embeddings import embed_texts, warm_model
+from intelligence.retrieval import add_chunks
 from database.db import DEFAULT_USER_ID
 
 BRAIN_BACKUP_DIR = Path(__file__).parent.parent.parent / "brain-backup"
@@ -68,7 +69,7 @@ def seed():
         if len(text) < 100:
             continue
 
-        chunks = chunker.chunk_text(text)
+        chunks = _chunk_text(text)
         if not chunks:
             continue
 
@@ -77,7 +78,7 @@ def seed():
         access_count = _access_count_for_age(created_days_ago)
         last_accessed = created_at + timedelta(days=random.randint(0, min(created_days_ago, 7)))
 
-        scores = [complexity.score(c) for c in chunks]
+        scores = [complexity_score(c) for c in chunks]
         embeddings = embed_texts(chunks)
 
         chunk_ids = []

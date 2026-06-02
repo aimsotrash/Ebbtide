@@ -1,15 +1,14 @@
-import math
-
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, UploadFile
 
-from core import chunker, complexity
-from core.embeddings import embed_texts
+from intelligence.domain import chunk_text as _chunk_text, complexity_score
+from intelligence.embeddings import embed_texts
+from intelligence.ranking import display_complexity_k, display_stability
+from intelligence.retrieval import add_chunks
 from database.db import insert_chunk
 from models.schemas import IngestResponse, TextIngestRequest, TextIngestResponse
 from parsers.file_parser import parse
 from routers.deps import get_current_user_id
 from services.category_service import classify_and_store
-from services.chroma_service import add_chunks
 
 router = APIRouter()
 
@@ -37,11 +36,11 @@ async def ingest_files(
         if not text.strip():
             continue
 
-        chunks = chunker.chunk_text(text)
+        chunks = _chunk_text(text)
         if not chunks:
             continue
 
-        scores = [complexity.score(c) for c in chunks]
+        scores = [complexity_score(c) for c in chunks]
         embeddings = embed_texts(chunks)
 
         chunk_ids: list[str] = []
@@ -79,11 +78,11 @@ async def ingest_text(
     if not body.content.strip():
         raise HTTPException(status_code=400, detail="Content cannot be empty.")
 
-    chunks = chunker.chunk_text(body.content)
+    chunks = _chunk_text(body.content)
     if not chunks:
         raise HTTPException(status_code=400, detail="Could not extract any chunks from content.")
 
-    scores = [complexity.score(c) for c in chunks]
+    scores = [complexity_score(c) for c in chunks]
     embeddings = embed_texts(chunks)
     source_name = body.source_name or "manual_entry"
 
@@ -107,8 +106,8 @@ async def ingest_text(
         background_tasks.add_task(classify_and_store, cid, chunk_text)
 
     first_score = scores[0] if scores else 0.5
-    S = round((1.0 + 0.5 * math.log1p(0)) * 9.0, 2)
-    k = round(0.5 + 1.5 * max(0.0, min(1.0, first_score)), 3)
+    S = display_stability(0)
+    k = display_complexity_k(first_score)
 
     return TextIngestResponse(
         chunk_id=chunk_ids[0],

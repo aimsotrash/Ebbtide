@@ -1,29 +1,8 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
-import {
-  Activity, Search, BrainCircuit, BookOpen,
-  CalendarDays, Timer, Settings, LogOut, Gauge,
-} from 'lucide-react';
+import { Settings, LogOut, Gauge } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-
-const navGroups = [
-  {
-    label: 'Recall loop',
-    items: [
-      { to: '/',         label: 'Health',   icon: Activity, exact: true },
-      { to: '/search',   label: 'Discover', icon: Search },
-      { to: '/library',  label: 'Library',  icon: BookOpen },
-      { to: '/review',   label: 'Practice', icon: BrainCircuit },
-    ],
-  },
-  {
-    label: 'Tools',
-    items: [
-      { to: '/calendar', label: 'Calendar', icon: CalendarDays },
-      { to: '/pomodoro', label: 'Focus',    icon: Timer },
-    ],
-  },
-];
+import { navGroups } from './navConfig';
 
 /** One-row account control: avatar + name (left) + Settings + Logout icons (right).
  *  Always pinned at the bottom of the sidebar regardless of page scroll. */

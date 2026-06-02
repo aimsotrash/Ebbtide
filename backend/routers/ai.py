@@ -1,10 +1,14 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
+from ratelimit import rate_limit
 from routers.deps import get_current_user_id
-from services.llm_service import get_llm
+from intelligence.llm import get_llm
 
 router = APIRouter()
+
+# LLM endpoints are gated by both auth and a rate limit (paid-API spend control).
+_ai_guard = [Depends(rate_limit("ai"))]
 
 
 class SummarizeRequest(BaseModel):
@@ -20,7 +24,7 @@ class OptimizeRequest(BaseModel):
     expanded: str
 
 
-@router.post("/ai/summarize")
+@router.post("/ai/summarize", dependencies=_ai_guard)
 def summarize_note(body: SummarizeRequest, user_id: str = Depends(get_current_user_id)):
     llm = get_llm()
     result = llm.complete(
@@ -30,7 +34,7 @@ def summarize_note(body: SummarizeRequest, user_id: str = Depends(get_current_us
     return {"summary": result.strip()}
 
 
-@router.post("/ai/expand")
+@router.post("/ai/expand", dependencies=_ai_guard)
 def expand_note(body: ExpandRequest, user_id: str = Depends(get_current_user_id)):
     llm = get_llm()
     result = llm.complete(
@@ -47,7 +51,7 @@ Write detailed study notes on this topic:""",
     return {"expanded": result.strip()}
 
 
-@router.post("/ai/optimize")
+@router.post("/ai/optimize", dependencies=_ai_guard)
 def optimize_note(body: OptimizeRequest, user_id: str = Depends(get_current_user_id)):
     llm = get_llm()
     result = llm.complete(

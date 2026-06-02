@@ -35,7 +35,7 @@ async function doFetch(path: string, init: RequestInit | undefined, token: strin
 }
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  let token = getAccessToken();
+  const token = getAccessToken();
   let res = await doFetch(path, init, token);
 
   if (res.status === 401 && token) {
@@ -178,7 +178,7 @@ export async function ingestFile(file: File): Promise<FileIngestResponse> {
     });
   };
 
-  let token = getAccessToken();
+  const token = getAccessToken();
   let res = await send(token);
   if (res.status === 401 && token) {
     const newToken = await refreshAccessToken();

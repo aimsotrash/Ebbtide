@@ -58,9 +58,13 @@ const CATEGORY_EMOJI: Record<string, string> = {
   development: '💻',
   'ai/ml': '🤖',
   'system design': '🏗️',
+  mathematics: '🧮',
+  design: '🎨',
+  research: '🔬',
   productivity: '📈',
   personal: '🌱',
   reference: '📚',
+  other: '📦',
   general: '📝',
 };
 
@@ -98,11 +102,13 @@ export function Dashboard() {
     if (horizon.hours === 0 && stats) {
       return { strong: stats.strong, fading: stats.fading, weak: stats.weak, critical: stats.critical };
     }
+    // Thresholds mirror the backend's classify_retention (0.8 / 0.5 / 0.2) so the
+    // projected buckets stay consistent with the "Now" counts from /api/stats.
     const c = { strong: 0, fading: 0, weak: 0, critical: 0 };
     for (const r of projected) {
-      if (r >= 0.72) c.strong++;
+      if (r >= 0.8) c.strong++;
       else if (r >= 0.5) c.fading++;
-      else if (r >= 0.28) c.weak++;
+      else if (r >= 0.2) c.weak++;
       else c.critical++;
     }
     return c;
@@ -177,10 +183,10 @@ export function Dashboard() {
       {/* Stat row */}
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: 'Strong',   value: counts.strong,   dot: 'var(--good)',   hint: '≥ 72%' },
-          { label: 'Fading',   value: counts.fading,   dot: 'var(--warn)',   hint: '50 – 72%' },
-          { label: 'Weak',     value: counts.weak,     dot: '#d66a2f',       hint: '28 – 50%' },
-          { label: 'Critical', value: counts.critical, dot: 'var(--danger)', hint: '< 28%' },
+          { label: 'Strong',   value: counts.strong,   dot: 'var(--good)',   hint: '≥ 80%' },
+          { label: 'Fading',   value: counts.fading,   dot: 'var(--warn)',   hint: '50 – 80%' },
+          { label: 'Weak',     value: counts.weak,     dot: '#d66a2f',       hint: '20 – 50%' },
+          { label: 'Critical', value: counts.critical, dot: 'var(--danger)', hint: '< 20%' },
         ].map(({ label, value, dot, hint }, i) => (
           <motion.div
             key={label}

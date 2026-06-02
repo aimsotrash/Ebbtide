@@ -394,14 +394,39 @@ def create_quiz_session(user_id: str = DEFAULT_USER_ID, total: int = 5) -> str:
     return session_id
 
 
-def complete_quiz_session(session_id: str, correct_count: int) -> None:
+def complete_quiz_session(session_id: str, correct_count: int, user_id: Optional[str] = None) -> bool:
+    """Mark a quiz session finished. Scoped to user_id when provided so one user
+    cannot complete another user's session. Returns True if a row was updated."""
     conn = _connect()
-    conn.execute(
-        "UPDATE quiz_sessions SET completed_at = ?, correct_count = ? WHERE id = ?",
-        (datetime.now(timezone.utc).isoformat(), correct_count, session_id),
-    )
+    if user_id is None:
+        cursor = conn.execute(
+            "UPDATE quiz_sessions SET completed_at = ?, correct_count = ? WHERE id = ?",
+            (datetime.now(timezone.utc).isoformat(), correct_count, session_id),
+        )
+    else:
+        cursor = conn.execute(
+            "UPDATE quiz_sessions SET completed_at = ?, correct_count = ? WHERE id = ? AND user_id = ?",
+            (datetime.now(timezone.utc).isoformat(), correct_count, session_id, user_id),
+        )
+    updated = cursor.rowcount > 0
     conn.commit()
     conn.close()
+    return updated
+
+
+def get_quiz_history(user_id: str, limit: int = 20) -> list[sqlite3.Row]:
+    """Return the user's completed quiz sessions, most recent first."""
+    conn = _connect()
+    rows = conn.execute(
+        """SELECT id, started_at, completed_at, correct_count, total_count
+           FROM quiz_sessions
+           WHERE user_id = ? AND completed_at IS NOT NULL
+           ORDER BY completed_at DESC
+           LIMIT ?""",
+        (user_id, limit),
+    ).fetchall()
+    conn.close()
+    return rows
 
 
 # ---------------------------------------------------------------------------

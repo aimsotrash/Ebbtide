@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { marked } from 'marked';
+import { sanitizeHtml } from '@/lib/sanitize';
 import { ingestText, getAllChunks } from '@/lib/api';
 import { useNotes } from '@/hooks/useNotes';
 import type { BackendChunk } from '@/lib/types';
@@ -160,7 +161,7 @@ export function NoteEditorPage() {
     command.cmd.slice(1).startsWith(slashFilter) || command.label.toLowerCase().startsWith(slashFilter)
   );
   const wordCount = (active?.content ?? '').split(/\s+/).filter(Boolean).length;
-  const renderedHtml = marked.parse(active?.content ?? '') as string;
+  const renderedHtml = sanitizeHtml(marked.parse(active?.content ?? '') as string);
 
   return (
     <div className="grid min-h-[calc(100vh-132px)] gap-4 xl:grid-cols-[300px_minmax(0,1fr)]">

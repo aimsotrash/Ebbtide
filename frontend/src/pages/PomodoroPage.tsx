@@ -124,13 +124,14 @@ export function PomodoroPage() {
   }, [running, finish]);
 
   useEffect(() => {
+    // Restore a persisted timer once on mount; `finish` is stable enough here.
     const state = loadTimerState();
     if (state.startedAt !== null) {
       const nextRemaining = computeRemaining(state);
       if (nextRemaining <= 0) finish();
       else setRemaining(nextRemaining);
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function startTimer() {
     setTimerState({ mode, pausedRemaining: remaining, startedAt: Date.now() });

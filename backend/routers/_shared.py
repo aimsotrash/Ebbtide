@@ -5,8 +5,9 @@ previously duplicated in fading.py, chunks.py, search.py, discovery.py,
 stats.py, and health.py.
 """
 
-import math
 from datetime import datetime, timezone
+
+from intelligence.ranking import display_complexity_k, display_stability
 
 
 def parse_dt(s: str) -> datetime:
@@ -40,8 +41,8 @@ def to_chunk_full(row: dict, retention: float) -> dict:
     """
     access_count = row["access_count"]
     complexity_score = row["complexity_score"]
-    stability_s = round((1.0 + 0.5 * math.log1p(access_count)) * 9.0, 2)
-    complexity_k = round(0.5 + 1.5 * max(0.0, min(1.0, complexity_score)), 3)
+    stability_s = display_stability(access_count)
+    complexity_k = display_complexity_k(complexity_score)
 
     source_file = row["source_file"] or ""
     ext = source_file.rsplit(".", 1)[-1].lower() if "." in source_file else ""
