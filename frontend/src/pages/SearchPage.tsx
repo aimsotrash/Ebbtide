@@ -94,7 +94,7 @@ export function SearchPage() {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {error && <p className="m-4 rounded-lg bg-red-50 p-3 text-sm text-[var(--danger)]">{error}</p>}
+          {error && <p className="m-4 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}
 
           {loading && (
             <div className="space-y-3 p-4">
@@ -133,10 +133,10 @@ export function SearchPage() {
                   {result.highlight ? <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(result.highlight) }} /> : result.chunk.content}
                 </p>
                 <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <span className="tag capitalize" style={{ color: catColor, borderColor: `${catColor}44`, background: `${catColor}14` }}>
+                  <span className="tag capitalize" style={{ color: catColor, borderColor: `color-mix(in oklab, ${catColor} 27%, transparent)`, background: `color-mix(in oklab, ${catColor} 8%, transparent)` }}>
                     {result.chunk.category ?? 'general'}
                   </span>
-                  <span className="tag" style={{ color, borderColor: `${color}44`, background: `${color}14` }}>
+                  <span className="tag" style={{ color, borderColor: `color-mix(in oklab, ${color} 27%, transparent)`, background: `color-mix(in oklab, ${color} 8%, transparent)` }}>
                     {retentionToLabel(retention)} {formatRetentionPct(retention)}
                   </span>
                 </div>

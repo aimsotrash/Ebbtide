@@ -61,7 +61,7 @@ function AccountRow() {
 
 export function Sidebar() {
   return (
-    <aside className="hidden w-60 shrink-0 border-r border-[var(--border)] bg-[rgba(255,253,248,0.62)] px-3 py-4 md:flex md:flex-col">
+    <aside className="hidden w-60 shrink-0 border-r border-[var(--border)] bg-[oklch(var(--background)/0.62)] px-3 py-4 md:flex md:flex-col">
       {/* AppShell gives this aside a fixed viewport-minus-header height; the nav scrolls inside, the AccountRow stays pinned. */}
       <div className="flex-1 space-y-5 overflow-y-auto">
         {navGroups.map((group) => (

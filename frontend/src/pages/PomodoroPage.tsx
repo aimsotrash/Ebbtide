@@ -198,7 +198,7 @@ export function PomodoroPage() {
           <div className="flex flex-col items-center">
             <div className="relative h-72 w-72">
               <svg viewBox="0 0 280 280" className="h-full w-full -rotate-90">
-                <circle cx="140" cy="140" r="112" fill="none" stroke="#e4d9c8" strokeWidth="16" />
+                <circle cx="140" cy="140" r="112" fill="none" className="stroke-secondary" strokeWidth="16" />
                 <circle
                   cx="140"
                   cy="140"

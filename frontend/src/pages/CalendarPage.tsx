@@ -38,7 +38,7 @@ function daysUntil(d: Date) {
 
 function urgencyColor(days: number) {
   if (days < 0) return 'var(--danger)';
-  if (days < 2) return '#d66a2f';
+  if (days < 2) return 'oklch(0.65 0.17 45)';
   if (days < 7) return 'var(--warn)';
   if (days < 30) return 'var(--good)';
   return 'var(--accent)';
@@ -139,8 +139,8 @@ export function CalendarPage() {
                   onClick={() => setSelected(isSelected ? null : key)}
                   className="min-h-20 rounded-lg border p-2 text-left transition hover:bg-[var(--surface-2)]"
                   style={{
-                    borderColor: isSelected ? 'var(--accent-border)' : events.length ? `${color}55` : 'var(--border)',
-                    background: isSelected ? 'var(--accent-soft)' : isToday ? 'rgba(20,122,114,0.06)' : 'var(--surface)',
+                    borderColor: isSelected ? 'var(--accent-border)' : events.length ? `color-mix(in oklab, ${color} 33%, transparent)` : 'var(--border)',
+                    background: isSelected ? 'var(--accent-soft)' : isToday ? 'oklch(var(--lavender) / 0.08)' : 'var(--surface)',
                   }}
                 >
                   <span className="text-sm font-bold text-[var(--text-1)]">{day}</span>

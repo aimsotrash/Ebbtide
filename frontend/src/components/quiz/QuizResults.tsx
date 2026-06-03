@@ -50,8 +50,8 @@ export function QuizResults({ results, session, onRestart }: QuizResultsProps) {
                 className={cn(
                   'flex items-start gap-3 rounded-lg border p-3',
                   result.correct
-                    ? 'border-[rgba(58,141,84,0.25)] bg-[rgba(58,141,84,0.08)]'
-                    : 'border-[rgba(201,68,51,0.25)] bg-[rgba(201,68,51,0.08)]'
+                    ? 'border-[color-mix(in_oklab,var(--good)_25%,transparent)] bg-[color-mix(in_oklab,var(--good)_8%,transparent)]'
+                    : 'border-destructive/25 bg-destructive/10'
                 )}
               >
                 {result.correct ? <CheckCircle2 size={17} className="mt-0.5 shrink-0 text-[var(--good)]" /> : <XCircle size={17} className="mt-0.5 shrink-0 text-[var(--danger)]" />}

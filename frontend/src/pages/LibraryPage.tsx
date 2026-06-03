@@ -304,7 +304,7 @@ export function LibraryPage() {
                       <span className="tag capitalize" style={{ color: categoryColors[category], borderColor: `${categoryColors[category]}44`, background: `${categoryColors[category]}14` }}>
                         {category}
                       </span>
-                      <span className="tag" style={{ color, borderColor: `${color}44`, background: `${color}14` }}>
+                      <span className="tag" style={{ color, borderColor: `color-mix(in oklab, ${color} 27%, transparent)`, background: `color-mix(in oklab, ${color} 8%, transparent)` }}>
                         {retentionToLabel(retention)}
                       </span>
                       {chunk.folder && <span className="tag"><FolderOpen size={12} /> {chunk.folder}</span>}

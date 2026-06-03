@@ -1,0 +1,597 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Radius scale base — the only radius source of truth. */
+  --radius: 0.5rem;
+
+  /* ── Superhuman semantic tokens (oklch channels). These are consumed by the
+        Tailwind @theme-style color registrations in tailwind.config.js, which
+        wrap them as `oklch(var(--token) / <alpha-value>)` so utilities like
+        bg-background, text-foreground, bg-lavender/30 all work in v3. ── */
+  --background: 1 0 0;
+  --foreground: 0.22 0.01 60;
+  --primary: 0.20 0.06 280;
+  --primary-foreground: 0.97 0.005 280;
+  --secondary: 0.93 0.015 75;
+  --secondary-foreground: 0.22 0.01 60;
+  --muted: 0.955 0.008 75;
+  --muted-foreground: 0.50 0.01 60;
+  --accent-foreground: 0.22 0.01 60;
+  --destructive: 0.577 0.245 27;
+  --destructive-foreground: 0.97 0.005 280;
+  --input: 0.89 0.012 70;
+  --ring: 0.82 0.10 290;
+
+  /* Special tokens */
+  --cream: 0.93 0.015 75;
+  --lavender: 0.82 0.10 290;
+  --hero: 0.15 0.04 280;
+
+  /* ── Legacy application variables, kept as full colors and retuned to the
+        Superhuman palette. The existing component vocabulary references these
+        directly (var(--surface), var(--text-1), …), so retuning here reskins
+        the whole app without touching hundreds of call sites. ── */
+  --bg: oklch(1 0 0);
+  --bg-soft: oklch(0.97 0.01 75);
+  --surface: oklch(1 0 0);
+  --surface-2: oklch(0.975 0.008 75);
+  --surface-3: oklch(0.93 0.015 75);
+  --border: oklch(0.89 0.012 70);
+  --border-strong: oklch(0.83 0.015 70);
+  --text-1: oklch(0.22 0.01 60);
+  --text-2: oklch(0.40 0.012 60);
+  --text-3: oklch(0.50 0.01 60);
+  --text-4: oklch(0.62 0.012 65);
+  /* Primary action color — deep indigo near-black, matches --primary. */
+  --accent: oklch(0.20 0.06 280);
+  --accent-hover: oklch(0.27 0.07 282);
+  /* Lavender wash + lavender line for soft accent surfaces. */
+  --accent-soft: oklch(0.95 0.03 290);
+  --accent-border: oklch(0.82 0.10 290);
+  --warn: oklch(0.70 0.15 70);
+  --danger: oklch(0.577 0.245 27);
+  --good: oklch(0.60 0.13 150);
+  --info: oklch(0.55 0.12 260);
+  --violet: oklch(0.58 0.18 290);
+  --shadow: 0 18px 50px oklch(0.20 0.06 280 / 0.10);
+}
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background: var(--bg);
+  }
+
+  body {
+    min-height: 100vh;
+    margin: 0;
+    background: var(--bg);
+    color: var(--text-1);
+    font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 460;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  button, input, textarea, select {
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  ::selection {
+    background: oklch(var(--lavender) / 0.28);
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(var(--lavender) / 0.6);
+  }
+}
+
+@layer components {
+  .app-card,
+  .gcard,
+  .glass-card,
+  .corp-card {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 1px 0 oklch(1 0 0 / 0.75);
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+  }
+
+  .app-card:hover,
+  .gcard:hover,
+  .glass-card:hover,
+  .corp-card:hover {
+    border-color: oklch(var(--lavender) / 0.3);
+    box-shadow: 0 10px 30px oklch(var(--lavender) / 0.08);
+  }
+
+  .app-card-muted,
+  .corp-card-2 {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .app-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .app-section-title {
+    color: var(--text-1);
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .app-label,
+  .corp-section-label,
+  .label {
+    color: oklch(var(--lavender) / 0.95);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .app-muted {
+    color: var(--text-2);
+  }
+
+  .app-subtle {
+    color: var(--text-3);
+  }
+
+  .btn-primary,
+  .corp-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 2.25rem;
+    padding: 0.55rem 0.85rem;
+    border: 1px solid oklch(var(--primary) / 0.2);
+    border-radius: 8px;
+    background: var(--accent);
+    color: white;
+    font-size: 0.84rem;
+    font-weight: 700;
+    line-height: 1;
+    transition: background 160ms ease, border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+  }
+
+  .btn-primary:hover,
+  .corp-btn-primary:hover {
+    background: var(--accent-hover);
+    box-shadow: 0 6px 18px oklch(var(--lavender) / 0.18);
+  }
+
+  .btn-primary:active,
+  .corp-btn-primary:active {
+    transform: translateY(1px);
+  }
+
+  .btn-primary:disabled,
+  .corp-btn-primary:disabled {
+    opacity: 0.45;
+  }
+
+  .btn-secondary,
+  .corp-btn-secondary,
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 2.25rem;
+    padding: 0.52rem 0.78rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text-2);
+    font-size: 0.84rem;
+    font-weight: 700;
+    line-height: 1;
+    transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+  }
+
+  .btn-secondary:hover,
+  .corp-btn-secondary:hover,
+  .btn:hover {
+    background: var(--surface-2);
+    border-color: var(--accent-border);
+    color: var(--text-1);
+  }
+
+  .btn-ghost,
+  .corp-btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 2rem;
+    padding: 0.4rem 0.58rem;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-2);
+    font-size: 0.8rem;
+    font-weight: 700;
+    transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  }
+
+  .btn-ghost:hover,
+  .corp-btn-ghost:hover {
+    background: oklch(var(--foreground) / 0.05);
+    border-color: oklch(var(--foreground) / 0.08);
+    color: var(--text-1);
+  }
+
+  .corp-input,
+  .input-field,
+  .input {
+    display: block;
+    width: 100%;
+    min-height: 2.35rem;
+    padding: 0.55rem 0.72rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text-1);
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+  }
+
+  .corp-input::placeholder,
+  .input-field::placeholder,
+  .input::placeholder {
+    color: var(--text-4);
+  }
+
+  .corp-input:focus,
+  .input-field:focus,
+  .input:focus {
+    border-color: var(--accent-border);
+    box-shadow: 0 0 0 3px oklch(var(--ring) / 0.3);
+  }
+
+  .tag,
+  .corp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-2);
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  .nav-item,
+  .nav-item-active {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 2.25rem;
+    padding: 0.5rem 0.65rem;
+    border-radius: 8px;
+    color: var(--text-2);
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 150ms ease, color 150ms ease;
+  }
+
+  .nav-item:hover {
+    background: oklch(var(--lavender) / 0.1);
+    color: var(--text-1);
+  }
+
+  .nav-item-active {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid var(--accent-border);
+  }
+
+  .retention-bar-track {
+    position: relative;
+    height: 0.5rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--surface-3);
+  }
+
+  .retention-bar-fill {
+    height: 100%;
+    border-radius: inherit;
+    transition: width 300ms ease;
+  }
+
+  .badge-strong {
+    color: var(--good);
+    background: oklch(var(--good) / 0.12);
+    border: 1px solid oklch(var(--good) / 0.22);
+  }
+
+  .badge-fading {
+    color: var(--warn);
+    background: oklch(var(--warn) / 0.13);
+    border: 1px solid oklch(var(--warn) / 0.25);
+  }
+
+  .badge-weak,
+  .badge-critical {
+    color: var(--danger);
+    background: oklch(var(--destructive) / 0.12);
+    border: 1px solid oklch(var(--destructive) / 0.24);
+  }
+
+  .tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+}
+
+.line-clamp-1,
+.line-clamp-2,
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-1 { -webkit-line-clamp: 1; }
+.line-clamp-2 { -webkit-line-clamp: 2; }
+.line-clamp-3 { -webkit-line-clamp: 3; }
+
+mark {
+  border-radius: 3px;
+  background: oklch(var(--lavender) / 0.22);
+  color: var(--text-1);
+  padding: 0 0.15rem;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-fade-in,
+.animate-fade-up {
+  animation: fadeInUp 220ms ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 220ms ease-out;
+}
+
+.animate-spin {
+  animation: spin 800ms linear infinite;
+}
+
+.animate-spin-slow,
+.animate-pulse-ring {
+  animation: none;
+}
+
+.md-preview h1 {
+  color: var(--text-1);
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 1.2rem 0 0.65rem;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+}
+
+.md-preview h2 {
+  color: var(--text-1);
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 1rem 0 0.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+}
+
+.md-preview h3 {
+  color: var(--text-1);
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 0.9rem 0 0.4rem;
+}
+
+.md-preview p,
+.md-preview li {
+  color: var(--text-2);
+  line-height: 1.75;
+}
+
+.md-preview ul,
+.md-preview ol {
+  margin: 0.75rem 0 0.75rem 1.25rem;
+}
+
+.md-preview code {
+  border-radius: 4px;
+  background: oklch(var(--foreground) / 0.06);
+  color: var(--text-1);
+  padding: 0.08rem 0.28rem;
+  font-size: 0.88em;
+}
+
+.md-preview pre {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: oklch(var(--hero));
+  color: oklch(var(--background));
+  padding: 1rem;
+}
+
+.md-preview blockquote {
+  margin: 1rem 0;
+  padding: 0.55rem 0.85rem;
+  border-left: 3px solid var(--warn);
+  background: oklch(var(--warn) / 0.1);
+  color: var(--text-2);
+}
+
+.text-gradient-nebula,
+.text-gradient-flare,
+.text-gradient-pulsar {
+  color: var(--accent);
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+.text-metro-amber,
+.text-terminal-amber { color: var(--warn); }
+.text-metro-teal { color: var(--accent); }
+.text-metro-red { color: var(--danger); }
+.text-metro-green { color: var(--good); }
+.text-metro-purple { color: var(--violet); }
+.text-ink-50,
+.text-ink-100 { color: var(--text-1); }
+.text-ink-200,
+.text-ink-300 { color: var(--text-2); }
+.text-ink-400,
+.text-ink-500 { color: var(--text-3); }
+.border-ink-600,
+.border-metro-amber,
+.border-metro-teal,
+.border-metro-red { border-color: var(--border); }
+.bg-ink-700,
+.bg-ink-750,
+.bg-ink-800,
+.bg-ink-900 { background-color: var(--surface); }
+.border-l-3 { border-left-width: 3px; }
+.glow-nebula,
+.glow-pulsar,
+.glow-flare {
+  box-shadow: none;
+}
+
+.card-3d,
+.card-3d-inner {
+  position: relative;
+}
+
+.shimmer::after,
+.grain::after,
+.aurora-orb,
+.gcard::before,
+.gcard-spotlight::after {
+  display: none;
+}
+
+input[type="range"] {
+  appearance: none;
+  background: transparent;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 0.45rem;
+  border-radius: 999px;
+  background: var(--surface-3);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: -0.32rem;
+  border-radius: 999px;
+  border: 2px solid var(--surface);
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-border);
+}
+
+@layer utilities {
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  /* Soft lavender + pink radial blobs for hero / empty-state backdrops. */
+  .mesh-bg {
+    background-color: oklch(var(--background));
+    background-image:
+      radial-gradient(at 18% 22%, oklch(var(--lavender) / 0.12) 0px, transparent 50%),
+      radial-gradient(at 82% 14%, oklch(0.85 0.09 350 / 0.1) 0px, transparent 50%),
+      radial-gradient(at 72% 82%, oklch(var(--lavender) / 0.08) 0px, transparent 55%),
+      radial-gradient(at 28% 86%, oklch(0.85 0.09 350 / 0.06) 0px, transparent 50%);
+  }
+
+  /* Subtle dotted texture; set a text color on the element to tint the dots. */
+  .dot-overlay {
+    background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: 0.03;
+  }
+}

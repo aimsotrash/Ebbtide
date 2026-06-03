@@ -61,21 +61,21 @@ export function LoginPage() {
   return (
     <div className="min-h-screen bg-[var(--bg)] p-4 text-[var(--text-1)]">
       <div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-6xl overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow)] lg:grid-cols-[1.05fr_0.95fr]">
-        <section className="flex flex-col justify-between border-b border-[var(--border)] bg-[var(--surface-2)] p-8 lg:border-b-0 lg:border-r">
+        <section className="relative flex flex-col justify-between bg-hero p-8 text-background">
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--accent)] text-white">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-lavender text-hero animate-float">
               <Brain size={20} />
             </span>
             <div>
-              <p className="text-lg font-extrabold">Dory.md</p>
-              <p className="text-sm text-[var(--text-3)]">The notes app that remembers with you.</p>
+              <p className="text-lg font-bold tracking-[-0.02em]">Dory.md</p>
+              <p className="text-sm text-background/60">The notes app that remembers with you.</p>
             </div>
           </div>
 
           <div className="my-12 max-w-xl">
             <p className="app-label mb-3">Memory OS</p>
-            <h1 className="text-4xl font-extrabold leading-tight">Track what you know before it quietly fades.</h1>
-            <p className="mt-4 text-lg leading-8 text-[var(--text-2)]">
+            <h1 className="text-4xl font-bold tracking-[-0.02em] leading-[1.08]">Track what you know before it quietly fades.</h1>
+            <p className="mt-4 text-lg leading-8 text-background/70">
               Dory turns files and notes into memory chunks, models retention decay, and gives you the next best review action.
             </p>
           </div>
@@ -95,7 +95,7 @@ export function LoginPage() {
           </div>
         </section>
 
-        <section className="flex items-center justify-center p-6">
+        <section className="mesh-bg flex items-center justify-center p-6">
           <div className="w-full max-w-md">
             <div className="mb-6">
               <h2 className="text-2xl font-extrabold">{mode === 'login' ? 'Welcome back' : 'Create account'}</h2>
@@ -152,9 +152,9 @@ export function LoginPage() {
                 </div>
               </label>
 
-              {error && <div className="rounded-lg border border-[rgba(201,68,51,0.25)] bg-[rgba(201,68,51,0.08)] p-3 text-sm font-bold text-[var(--danger)]">{error}</div>}
+              {error && <div className="rounded-lg border border-destructive/25 bg-destructive/10 p-3 text-sm font-bold text-destructive">{error}</div>}
               {success && (
-                <div className="flex items-center gap-2 rounded-lg border border-[rgba(58,141,84,0.25)] bg-[rgba(58,141,84,0.08)] p-3 text-sm font-bold text-[var(--good)]">
+                <div className="flex items-center gap-2 rounded-lg border border-[color-mix(in_oklab,var(--good)_25%,transparent)] bg-[color-mix(in_oklab,var(--good)_8%,transparent)] p-3 text-sm font-bold text-[var(--good)]">
                   <CheckCircle2 size={15} /> {success}
                 </div>
               )}

@@ -59,7 +59,7 @@ export function QuizIntro({ onStart, loading }: QuizIntroProps) {
                 onClick={() => onStart(value === 'all' ? undefined : value)}
                 disabled={loading}
                 className="rounded-lg border px-4 py-3 text-sm font-bold transition hover:bg-[var(--surface-2)] disabled:opacity-50"
-                style={{ color, borderColor: value === 'all' ? 'var(--accent-border)' : `${color}55`, background: value === 'all' ? 'var(--accent-soft)' : `${color}14` }}
+                style={{ color, borderColor: value === 'all' ? 'var(--accent-border)' : `color-mix(in oklab, ${color} 33%, transparent)`, background: value === 'all' ? 'var(--accent-soft)' : `color-mix(in oklab, ${color} 8%, transparent)` }}
               >
                 {loading ? 'Loading...' : label}
               </button>

@@ -36,11 +36,11 @@ function cardTitle(c: { content: string; source_file: string }) {
 
 /** Map FSRS stability (in days) to one of our retention colors. */
 function stabilityColor(stabilityDays: number | null): string {
-  if (stabilityDays == null) return '#c94433'; // never reviewed = fragile
-  if (stabilityDays < 1)  return '#c94433';    // critical
-  if (stabilityDays < 7)  return '#d66a2f';    // weak
-  if (stabilityDays < 30) return '#c97917';    // fading
-  return '#3a8d54';                            // strong
+  if (stabilityDays == null) return 'oklch(0.577 0.245 27)'; // never reviewed = fragile
+  if (stabilityDays < 1)  return 'oklch(0.577 0.245 27)';    // critical
+  if (stabilityDays < 7)  return 'oklch(0.65 0.17 45)';      // weak
+  if (stabilityDays < 30) return 'oklch(0.70 0.15 70)';      // fading
+  return 'oklch(0.60 0.13 150)';                             // strong
 }
 
 function stabilityLabel(s: number | null): string {
@@ -145,7 +145,7 @@ export function Dashboard() {
       {/* Page title block */}
       <header>
         <div className="text-4xl mb-2">🐟</div>
-        <h1 className="text-3xl font-extrabold text-[var(--text-1)] leading-tight">
+        <h1 className="text-3xl font-bold tracking-[-0.02em] leading-[1.08] text-[var(--text-1)]">
           Welcome back, {firstName}
         </h1>
         <p className="mt-1 text-sm text-[var(--text-3)]">
@@ -185,7 +185,7 @@ export function Dashboard() {
         {[
           { label: 'Strong',   value: counts.strong,   dot: 'var(--good)',   hint: '≥ 80%' },
           { label: 'Fading',   value: counts.fading,   dot: 'var(--warn)',   hint: '50 – 80%' },
-          { label: 'Weak',     value: counts.weak,     dot: '#d66a2f',       hint: '20 – 50%' },
+          { label: 'Weak',     value: counts.weak,     dot: 'oklch(0.65 0.17 45)', hint: '20 – 50%' },
           { label: 'Critical', value: counts.critical, dot: 'var(--danger)', hint: '< 20%' },
         ].map(({ label, value, dot, hint }, i) => (
           <motion.div

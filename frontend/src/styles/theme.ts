@@ -6,18 +6,20 @@ export const STRONG_THRESHOLD = 0.8;
 export const FADING_THRESHOLD = 0.5;
 export const WEAK_THRESHOLD = 0.2;
 
+// Retention/data-viz colors are expressed in oklch and mirror the semantic
+// tokens in styles.css: strong=good, fading=warn, weak=orange, critical=destructive.
 export function retentionToColor(retention: number): string {
-  if (retention >= STRONG_THRESHOLD) return '#3a8d54';
-  if (retention >= FADING_THRESHOLD) return '#c97917';
-  if (retention >= WEAK_THRESHOLD) return '#d66a2f';
-  return '#c94433';
+  if (retention >= STRONG_THRESHOLD) return 'oklch(0.60 0.13 150)';
+  if (retention >= FADING_THRESHOLD) return 'oklch(0.70 0.15 70)';
+  if (retention >= WEAK_THRESHOLD) return 'oklch(0.65 0.17 45)';
+  return 'oklch(0.577 0.245 27)';
 }
 
 export function retentionToGlow(retention: number): string {
-  if (retention >= STRONG_THRESHOLD) return 'rgba(58, 141, 84, 0.2)';
-  if (retention >= FADING_THRESHOLD) return 'rgba(201, 121, 23, 0.2)';
-  if (retention >= WEAK_THRESHOLD) return 'rgba(214, 106, 47, 0.2)';
-  return 'rgba(201, 68, 51, 0.2)';
+  if (retention >= STRONG_THRESHOLD) return 'oklch(0.60 0.13 150 / 0.2)';
+  if (retention >= FADING_THRESHOLD) return 'oklch(0.70 0.15 70 / 0.2)';
+  if (retention >= WEAK_THRESHOLD) return 'oklch(0.65 0.17 45 / 0.2)';
+  return 'oklch(0.577 0.245 27 / 0.2)';
 }
 
 export function retentionToLabel(retention: number): string {
@@ -31,17 +33,17 @@ export function retentionToLabel(retention: number): string {
 // (intelligence/llm/categorization.py CATEGORIES) plus legacy frontend labels.
 // `general` is the fallback used when a category isn't listed.
 export const categoryColors: Record<string, string> = {
-  'computer science': '#466fb0',
-  'ai/ml': '#6d5bd0',
-  'system design': '#2f8f83',
-  mathematics: '#b0568f',
-  design: '#c97917',
-  productivity: '#3a8d54',
-  research: '#466fb0',
-  personal: '#147a72',
-  other: '#888276',
+  'computer science': 'oklch(0.55 0.12 260)',
+  'ai/ml': 'oklch(0.58 0.18 290)',
+  'system design': 'oklch(0.60 0.08 190)',
+  mathematics: 'oklch(0.62 0.15 350)',
+  design: 'oklch(0.70 0.15 70)',
+  productivity: 'oklch(0.60 0.13 150)',
+  research: 'oklch(0.55 0.12 260)',
+  personal: 'oklch(0.55 0.08 185)',
+  other: 'oklch(0.60 0.01 70)',
   // legacy / fallback keys
-  technical: '#466fb0',
-  reference: '#c97917',
-  general: '#6d5bd0',
+  technical: 'oklch(0.55 0.12 260)',
+  reference: 'oklch(0.70 0.15 70)',
+  general: 'oklch(0.58 0.18 290)',
 };

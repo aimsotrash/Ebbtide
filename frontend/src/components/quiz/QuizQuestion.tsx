@@ -38,7 +38,7 @@ export function QuizQuestion({ question, questionNumber, total, onAnswer }: Quiz
       <div className="app-card p-4">
         <div className="mb-3 flex items-center justify-between">
           <span className="text-sm font-bold text-[var(--text-2)]">Question {questionNumber} of {total}</span>
-          <span className="tag capitalize" style={{ color: catColor, background: `${catColor}14`, borderColor: `${catColor}44` }}>
+          <span className="tag capitalize" style={{ color: catColor, background: `color-mix(in oklab, ${catColor} 8%, transparent)`, borderColor: `color-mix(in oklab, ${catColor} 27%, transparent)` }}>
             <Timer size={13} /> {question.difficulty} {question.category}
           </span>
         </div>
@@ -58,7 +58,7 @@ export function QuizQuestion({ question, questionNumber, total, onAnswer }: Quiz
         )}
 
         {showHint && question.hint && (
-          <div className="mt-3 rounded-lg border border-[rgba(70,111,176,0.25)] bg-[rgba(70,111,176,0.08)] p-3 text-sm text-[var(--text-2)]">
+          <div className="mt-3 rounded-lg border border-[color-mix(in_oklab,var(--info)_25%,transparent)] bg-[color-mix(in_oklab,var(--info)_8%,transparent)] p-3 text-sm text-[var(--text-2)]">
             {question.hint}
           </div>
         )}
@@ -84,8 +84,8 @@ export function QuizQuestion({ question, questionNumber, total, onAnswer }: Quiz
                 className={cn(
                   'flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm font-bold transition',
                   state === 'idle' && 'border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-2)] hover:border-[var(--accent-border)] hover:bg-[var(--surface)]',
-                  state === 'correct' && 'border-[rgba(58,141,84,0.35)] bg-[rgba(58,141,84,0.10)] text-[var(--good)]',
-                  state === 'wrong' && 'border-[rgba(201,68,51,0.35)] bg-[rgba(201,68,51,0.10)] text-[var(--danger)]',
+                  state === 'correct' && 'border-[color-mix(in_oklab,var(--good)_35%,transparent)] bg-[color-mix(in_oklab,var(--good)_10%,transparent)] text-[var(--good)]',
+                  state === 'wrong' && 'border-destructive/35 bg-destructive/10 text-destructive',
                   state === 'muted' && 'border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-4)]'
                 )}
               >

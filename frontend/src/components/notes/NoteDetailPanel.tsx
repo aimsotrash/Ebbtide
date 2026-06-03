@@ -261,12 +261,12 @@ export function NoteDetailPanel({ chunk, folders = [], onDelete, onContentUpdate
             <p className="truncate text-lg font-extrabold text-[var(--text-1)]">{baseName(chunk.source_file)}</p>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               {chunk.category && (
-                <span className="tag capitalize" style={{ color: catColor, background: `${catColor}14`, borderColor: `${catColor}44` }}>
+                <span className="tag capitalize" style={{ color: catColor, background: `color-mix(in oklab, ${catColor} 8%, transparent)`, borderColor: `color-mix(in oklab, ${catColor} 27%, transparent)` }}>
                   {chunk.category}
                 </span>
               )}
               {chunk.folder && <span className="tag"><FolderOpen size={12} /> {chunk.folder}</span>}
-              <span className="tag" style={{ color, background: `${color}14`, borderColor: `${color}44` }}>
+              <span className="tag" style={{ color, background: `color-mix(in oklab, ${color} 8%, transparent)`, borderColor: `color-mix(in oklab, ${color} 27%, transparent)` }}>
                 {formatRetentionPct(retention)} {retentionToLabel(retention)}
               </span>
             </div>
@@ -356,7 +356,7 @@ export function NoteDetailPanel({ chunk, folders = [], onDelete, onContentUpdate
           <div className="flex items-center justify-center py-16"><Loader2 size={22} className="animate-spin text-[var(--accent)]" /></div>
         ) : isEncrypted && !decryptedView ? (
           <div className="mx-auto flex max-w-md flex-col items-center justify-center gap-4 py-20 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-[rgba(201,121,23,0.12)] text-[var(--warn)]">
+            <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-[color-mix(in_oklab,var(--warn)_12%,transparent)] text-[var(--warn)]">
               <Lock size={24} />
             </div>
             <div>
@@ -386,14 +386,14 @@ export function NoteDetailPanel({ chunk, folders = [], onDelete, onContentUpdate
             )}
 
             {(aiPhase === 'expanded' || aiPhase === 'optimizing' || aiPhase === 'optimized') && expanded && (
-              <div className="rounded-lg border border-[rgba(70,111,176,0.25)] bg-[rgba(70,111,176,0.08)] p-4">
+              <div className="rounded-lg border border-[color-mix(in_oklab,var(--info)_25%,transparent)] bg-[color-mix(in_oklab,var(--info)_8%,transparent)] p-4">
                 <p className="mb-2 flex items-center gap-2 text-sm font-bold text-[var(--info)]"><Layers size={15} /> Deep dive</p>
                 <pre className="whitespace-pre-wrap font-sans text-sm leading-7 text-[var(--text-2)]">{expanded}</pre>
               </div>
             )}
 
             {aiPhase === 'optimized' && optimized && (
-              <div className="rounded-lg border border-[rgba(58,141,84,0.25)] bg-[rgba(58,141,84,0.08)] p-4">
+              <div className="rounded-lg border border-[color-mix(in_oklab,var(--good)_25%,transparent)] bg-[color-mix(in_oklab,var(--good)_8%,transparent)] p-4">
                 <div className="mb-2 flex items-center justify-between gap-3">
                   <p className="flex items-center gap-2 text-sm font-bold text-[var(--good)]"><Sparkles size={15} /> Optimized note</p>
                   <button type="button" onClick={saveOptimized} disabled={savedOptimized} className="btn-secondary">

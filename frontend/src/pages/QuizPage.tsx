@@ -92,7 +92,7 @@ export function QuizPage() {
   return (
     <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
       <main className="min-w-0">
-        {error && <div className="mb-4 rounded-lg border border-[rgba(201,68,51,0.25)] bg-[rgba(201,68,51,0.08)] p-3 text-sm font-bold text-[var(--danger)]">{error}</div>}
+        {error && <div className="mb-4 rounded-lg border border-destructive/25 bg-destructive/10 p-3 text-sm font-bold text-destructive">{error}</div>}
         {phase === 'intro' && <QuizIntro onStart={handleStart} loading={loading} />}
         {phase === 'playing' && session && (
           <QuizQuestion

@@ -68,7 +68,7 @@ export function SearchBar({ onSearch, loading, initialValue = '', placeholder }:
         <div
           className={`flex items-center gap-3 rounded-lg border px-4 py-3 transition ${
             focused
-              ? 'border-[var(--accent-border)] bg-[var(--surface)] shadow-[0_0_0_3px_rgba(20,122,114,0.10)]'
+              ? 'border-[var(--accent-border)] bg-[var(--surface)] shadow-[0_0_0_3px_oklch(var(--ring)/0.18)]'
               : 'border-[var(--border)] bg-[var(--surface-2)] hover:border-[var(--border-strong)]'
           }`}
         >

@@ -24,7 +24,7 @@ export function DiscoveryCard({ discovery, onDismiss }: DiscoveryCardProps) {
         <div className="min-w-0 flex-1">
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <span className="text-sm font-bold text-[var(--text-1)]">Dory found a fading memory</span>
-            <span className="tag" style={{ color, borderColor: `${color}44`, background: `${color}16` }}>
+            <span className="tag" style={{ color, borderColor: `color-mix(in oklab, ${color} 27%, transparent)`, background: `color-mix(in oklab, ${color} 9%, transparent)` }}>
               {label} {formatRetentionPct(retention)}
             </span>
           </div>

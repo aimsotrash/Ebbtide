@@ -52,7 +52,7 @@ export function Header({ hasDiscovery, onDiscoveryClick }: HeaderProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-[var(--border)] bg-[rgba(255,253,248,0.92)] px-4 backdrop-blur md:px-6">
+      <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-[var(--border)] bg-[oklch(var(--background)/0.92)] px-4 backdrop-blur md:px-6">
         <div className="flex min-w-0 items-center gap-4">
           <button
             type="button"

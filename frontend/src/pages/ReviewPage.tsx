@@ -7,7 +7,7 @@ import type { Grade, ReviewCard } from '@/lib/types';
 
 const GRADES: { value: Grade; label: string; shortcut: string; color: string; description: string }[] = [
   { value: 1, label: 'Again', shortcut: '1', color: 'var(--danger)', description: 'Forgot it' },
-  { value: 2, label: 'Hard',  shortcut: '2', color: '#d66a2f',      description: 'Recalled with effort' },
+  { value: 2, label: 'Hard',  shortcut: '2', color: 'oklch(0.65 0.17 45)', description: 'Recalled with effort' },
   { value: 3, label: 'Good',  shortcut: '3', color: 'var(--warn)',  description: 'Recalled correctly' },
   { value: 4, label: 'Easy',  shortcut: '4', color: 'var(--good)',  description: 'Trivial' },
 ];
@@ -239,7 +239,7 @@ export function ReviewPage() {
       </div>
 
       {error && (
-        <p className="mb-3 rounded-lg border border-[var(--danger)] bg-red-50 p-3 text-sm text-[var(--danger)]">{error}</p>
+        <p className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">{error}</p>
       )}
 
       {/* Next-due feedback toast for the card you just graded */}
