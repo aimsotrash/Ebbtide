@@ -1,16 +1,21 @@
-# Minimal dependency set to run the backend + intelligence test suites.
+# Minimal, PINNED dependency set to run the backend + intelligence test suites.
+#
 # Excludes torch/sentence-transformers because the tests skip the embedding
 # warm-up (DORY_SKIP_WARMUP=1) and stub embeddings, so the heavy ML stack is not
-# needed for CI. This set is what was used to verify 45 passing tests on
-# Python 3.14.5 locally; it also installs cleanly on 3.11–3.13.
-fastapi
-pydantic>=2
-httpx
-pytest
-python-jose[cryptography]
-bcrypt
-python-multipart
-numpy
-python-docx
-fsrs
-chromadb
+# needed for CI. These exact versions were verified to install and pass the full
+# suite (34 backend + 11 intelligence tests) on Python 3.14.5 locally; they also
+# install cleanly on the 3.11–3.13 range CI uses.
+#
+# Pins keep CI reproducible and let `pip-audit` evaluate a fixed surface.
+# To refresh: create a clean venv, install, run the suite, then `pip freeze`.
+fastapi==0.136.3
+pydantic==2.13.4
+httpx==0.28.1
+pytest==9.0.3
+python-jose[cryptography]==3.5.0
+bcrypt==5.0.0
+python-multipart==0.0.32
+numpy==2.4.6
+python-docx==1.2.0
+fsrs==6.3.1
+chromadb==1.5.9

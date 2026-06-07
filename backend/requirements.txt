@@ -1,19 +1,49 @@
+# Dory.md backend — PINNED production dependencies.
+#
+# Why pinned: reproducible builds + a fixed surface for `pip-audit` (P0 dependency
+# security). Unpinned ranges let a transitive bump silently change what ships.
+#
+# Verification status:
+#   - The web/auth/data subset (fastapi, uvicorn, chromadb, python-jose, bcrypt,
+#     numpy, python-docx, python-multipart, python-dotenv, fsrs) is the same set
+#     verified by the test suite (see requirements-test.txt) and is exercised in
+#     CI on Python 3.12.
+#   - The heavy ML stack (torch, sentence-transformers, scikit-learn, pdfplumber,
+#     beautifulsoup4) and the LLM SDKs (groq/openai/anthropic) are pinned to
+#     known-compatible releases for the torch 2.5.1 + Python 3.12 deploy target
+#     (the Dockerfile uses python:3.12-slim). torch has no cp314 wheel, so the
+#     full install is validated on 3.12 in the build pipeline, not on 3.14.
+#   - See docs/DEPENDENCY_UPGRADES.md for the upgrade/lock workflow.
+
+# ── PyTorch CPU build (must precede sentence-transformers) ──────────────
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch==2.5.1+cpu
-fastapi
-uvicorn[standard]
-chromadb
-sentence-transformers
-pdfplumber
-python-docx
-beautifulsoup4
-numpy
-scikit-learn
-groq
-openai
-anthropic
-python-multipart
-python-jose[cryptography]
-python-dotenv
-bcrypt
-fsrs
+
+# ── Web / API ───────────────────────────────────────────────────────────
+fastapi==0.136.3
+uvicorn[standard]==0.49.0
+python-multipart==0.0.32
+
+# ── Auth ──────────────────────────────────────────────────────────────--
+python-jose[cryptography]==3.5.0
+bcrypt==5.0.0
+
+# ── Vector store + ML / embeddings ──────────────────────────────────────
+chromadb==1.5.9
+sentence-transformers==3.3.1
+numpy==2.1.3
+scikit-learn==1.5.2
+
+# ── Document parsing ─────────────────────────────────────────────────────
+pdfplumber==0.11.4
+python-docx==1.2.0
+beautifulsoup4==4.12.3
+
+# ── LLM provider SDKs ────────────────────────────────────────────────────
+groq==0.13.1
+openai==1.58.1
+anthropic==0.42.0
+
+# ── Misc ──────────────────────────────────────────────────────────────--
+python-dotenv==1.2.2
+fsrs==6.3.1
