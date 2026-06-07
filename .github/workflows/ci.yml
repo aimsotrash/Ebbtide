@@ -1,0 +1,76 @@
+name: CI
+
+# Runs on every push/PR to main:
+#   - backend + intelligence pytest          (tests)
+#   - pip-audit                               (backend dependency security)
+#   - frontend tsc / lint / build             (build validation)
+#   - npm audit                               (frontend dependency security)
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Backend + Intelligence tests & audit
+    runs-on: ubuntu-latest
+    env:
+      DORY_ENV: dev
+      DORY_SKIP_WARMUP: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          # 3.12 has wheels for the full ML stack; the test subset only needs a
+          # slice of it. The full requirements.txt is validated on 3.12 too.
+          python-version: "3.12"
+
+      - name: Install test dependencies
+        run: pip install -r backend/requirements-test.txt
+
+      - name: Backend tests
+        working-directory: backend
+        run: python -m pytest tests/ -v
+
+      - name: Intelligence tests
+        run: python -m pytest intelligence/tests/ -v
+
+      # Dependency vulnerability scan. Non-blocking for now so a transitive
+      # advisory surfaces without wedging CI; remove continue-on-error to gate.
+      - name: Dependency audit (pip-audit)
+        continue-on-error: true
+        run: |
+          pip install pip-audit
+          pip-audit --strict --desc
+
+  frontend:
+    name: Frontend typecheck / lint / build & audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install (lockfile-exact)
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npx vite build
+
+      # Non-blocking dependency scan; flip to blocking once clean.
+      - name: Dependency audit (npm)
+        continue-on-error: true
+        run: npm audit --audit-level=high
