@@ -64,11 +64,14 @@ def init_db() -> None:
     conn = _connect()
     conn.executescript(SCHEMA_PATH.read_text())
     _migrate(conn)
-    # Ensure the default demo user exists
-    conn.execute(
-        "INSERT OR IGNORE INTO users (id, email, name) VALUES (?, ?, ?)",
-        (DEFAULT_USER_ID, "demo@dory.md", "Demo User"),
-    )
+    # Dev-only convenience: seed the local demo user so `demo@dory.md` works out
+    # of the box. In production NO default/fallback user is created — accounts
+    # exist only via real registration (P0 demo-account / dangerous-defaults).
+    if os.getenv("DORY_ENV", "dev").lower() == "dev":
+        conn.execute(
+            "INSERT OR IGNORE INTO users (id, email, name) VALUES (?, ?, ?)",
+            (DEFAULT_USER_ID, "demo@dory.md", "Demo User"),
+        )
     conn.commit()
     conn.close()
 

@@ -1,4 +1,5 @@
 import hashlib
+import os
 import re
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -77,7 +78,13 @@ def _issue_tokens(user_id: str, email: str, name: str) -> dict:
 
 
 def setup_demo_user() -> None:
-    """Ensure the demo user has a real bcrypt hash and a display name. Called at startup."""
+    """Dev-only: give the demo account a usable bcrypt hash + display name.
+
+    In any non-dev environment this is a no-op, so there are NO shared demo
+    credentials in production (P0 demo-account security). The demo row itself is
+    only created in dev (see database.db.init_db)."""
+    if os.getenv("DORY_ENV", "dev").lower() != "dev":
+        return
     from database.db import get_connection
     conn = get_connection()
     conn.execute(

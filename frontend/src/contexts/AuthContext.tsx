@@ -43,34 +43,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     storeTokens(data.access_token, data.refresh_token)
   }
 
-  function adoptLocalDemo(email: string) {
-    const session: User = { email, name: 'Demo User' }
-    setUser(session)
-    localStorage.setItem('dory-session', JSON.stringify(session))
-  }
-
   async function login(email: string, password: string): Promise<boolean> {
-    const isDemo = email.toLowerCase() === 'demo@dory.md' && password === 'demo123'
+    // Auth is strictly backend-driven. There is no offline/demo bypass that
+    // fabricates a session — a "logged in" state must always be backed by a
+    // real token (P0 demo-account security: no hidden bypass paths).
     try {
       const res = await fetch(`${config.apiBaseUrl}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       })
-      if (!res.ok) {
-        if (isDemo) {
-          adoptLocalDemo(email)
-          return true
-        }
-        return false
-      }
+      if (!res.ok) return false
       adoptSession(await res.json())
       return true
     } catch {
-      if (isDemo) {
-        adoptLocalDemo(email)
-        return true
-      }
       return false
     }
   }

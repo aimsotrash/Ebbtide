@@ -165,10 +165,12 @@ export function LoginPage() {
               </button>
             </form>
 
-            <div className="mt-5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-3">
-              <p className="text-xs font-bold text-[var(--text-3)]">Demo credentials</p>
-              <p className="mt-1 font-mono text-sm text-[var(--text-2)]">demo@dory.md / demo123</p>
-            </div>
+            {import.meta.env.DEV && (
+              <div className="mt-5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-3">
+                <p className="text-xs font-bold text-[var(--text-3)]">Demo credentials (dev only)</p>
+                <p className="mt-1 font-mono text-sm text-[var(--text-2)]">demo@dory.md / demo123</p>
+              </div>
+            )}
           </div>
         </section>
       </div>
