@@ -51,19 +51,56 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Dory.md API", version="1.0.0", lifespan=lifespan)
 
-# CORS: the default deliberately does NOT allow arbitrary public IPs (AUDIT P1-3).
-# It permits localhost/loopback and RFC-1918 private ranges for LAN dev, plus
-# *.vercel.app for preview deploys. Production should set CORS_ORIGIN_REGEX to an
-# explicit allow-list of its own origins.
-_CORS_REGEX = os.getenv(
-    "CORS_ORIGIN_REGEX",
-    r"https?://(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?"
-    r"|https://[\w-]+\.vercel\.app",
+# CORS (AUDIT P1-3 / P0 CORS hardening). The browser-facing allow-list is built
+# explicitly — there is NO wildcard, no `*.vercel.app`, and no public-IP regex in
+# any non-dev environment. Production must declare its origins.
+#
+# Dev-only convenience regex: localhost + RFC-1918 private LAN ranges (so you can
+# hit the dev server from a phone on the same Wi-Fi). It never matches public hosts.
+_DEV_CORS_REGEX = (
+    r"https?://(localhost|127\.0\.0\.1|"
+    r"10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|"
+    r"172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?"
 )
+
+
+def resolve_cors_kwargs(env: str | None = None) -> dict:
+    """Compute the CORS origin policy from the environment.
+
+    Precedence (first match wins):
+      1. CORS_ALLOW_ORIGINS — comma-separated list of EXACT origins (recommended
+         for production, e.g. "https://app.dory.md,https://dory.vercel.app").
+      2. CORS_ORIGIN_REGEX  — an explicit regex, for advanced multi-origin setups.
+      3. dev with neither set — localhost + private LAN ranges only.
+      4. non-dev with neither set — deny all cross-origin requests (and warn).
+         We never fall back to a permissive default outside dev.
+    """
+    env = (env or os.getenv("DORY_ENV", "dev")).lower()
+    explicit = os.getenv("CORS_ALLOW_ORIGINS", "").strip()
+    regex = os.getenv("CORS_ORIGIN_REGEX", "").strip()
+
+    if explicit:
+        return {"allow_origins": [o.strip() for o in explicit.split(",") if o.strip()]}
+    if regex:
+        return {"allow_origin_regex": regex}
+    if env == "dev":
+        return {"allow_origin_regex": _DEV_CORS_REGEX}
+
+    logger.warning(
+        "CORS: neither CORS_ALLOW_ORIGINS nor CORS_ORIGIN_REGEX is set in a "
+        "non-dev environment (DORY_ENV=%s). All cross-origin browser requests "
+        "will be blocked. Set CORS_ALLOW_ORIGINS to your frontend origin(s).",
+        env,
+    )
+    return {"allow_origins": []}
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=_CORS_REGEX,
+    **resolve_cors_kwargs(),
+    # The SPA authenticates with a bearer Authorization header (not cookies), so
+    # credentialed CORS is not strictly required, but we keep it on for parity
+    # with the explicit allow-list. It is never paired with a wildcard origin.
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type"],
