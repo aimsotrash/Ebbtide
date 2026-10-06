@@ -50,3 +50,6 @@ demo_chunks.json
 *.extracted.txt
 frontend/.vite/
 backend/.testvenv/
+
+# Local Claude Code settings
+.claude/settings.local.json
