@@ -1,18 +1,20 @@
-# Dory.md
+# Engram
 
-**The notes app that knows what you're about to forget.** Built in 48 hours at
-**UWB Hacks 2026** (MLH) by a team of three.
+[![CI](https://github.com/aimsotrash/Engram/actions/workflows/ci.yml/badge.svg)](https://github.com/aimsotrash/Engram/actions/workflows/ci.yml)
 
-**Live:** [dory-md-fork.vercel.app](https://dory-md-fork.vercel.app) ·
-**Upstream:** [vaishnavi1064/Dory.md](https://github.com/vaishnavi1064/Dory.md), where the
-project has kept evolving and has its own [live demo](https://dory-md.vercel.app).
+**The notes app that knows what you're about to forget.**
 
-This fork holds the hackathon build and the work that followed it through June 2026,
-plus my frontend fixes.
+Engram started as **Dory.md**, built in 48 hours at **UWB Hacks 2026** (MLH) by a
+team of three. This repository continues the project from my last commit to the team
+repository on June 7, 2026. The team repository,
+[vaishnavi1064/Dory.md](https://github.com/vaishnavi1064/Dory.md), has since gone its
+own way.
+
+**Live:** [dory-md-fork.vercel.app](https://dory-md-fork.vercel.app)
 
 ## What it does
 
-Dory.md splits your notes into chunks and gives each chunk a retention score that
+Engram splits your notes into chunks and gives each chunk a retention score that
 decays along an Ebbinghaus forgetting curve. That score is a ranking signal, not just
 a number on a dashboard. Search puts what you're forgetting first, reviews are
 scheduled with FSRS, and quizzes are built from your weakest material.
@@ -26,28 +28,50 @@ scheduled with FSRS, and quizzes are built from your weakest material.
 - **Knowledge-tree dashboard.** An interactive map of your notes and how well you
   remember them.
 
-## My part
+## Who built what
 
-I led the backend:
+Share of the code, counted with `git blame -w -M -C -C` over the code files (Python,
+TypeScript and JavaScript, CSS, HTML, SQL, shell and config files). Moved and copied lines keep their original
+author, and `.mailmap` merges each person's commit identities, so anyone can
+reproduce these numbers from this repository's history.
+
+| Snapshot | Lines of code | Nikhil Pawar | Vaishnavi Chaughule | Shraddha Deshpande |
+| --- | ---: | ---: | ---: | ---: |
+| End of the hackathon, Apr 26, 2026 (`f6f9657`) | 14,371 | 62.5% | 22.5% | 15.0% |
+| My last commit to the team repo, Jun 7, 2026 (`18d440e`, on the `Fix-login` branch) | 10,722 | 91.7% | 2.4% | 5.8% |
+
+At the hackathon I wrote the FastAPI backend and most of the React app, building on
+Shraddha's first version of the frontend. Vaishnavi wrote a separate intelligence
+package. In May and June I rebuilt `intelligence/` around the backend's own
+forgetting-curve engine, and that is the version in this repository.
+
+## My part
 
 - the FastAPI service and the API contract the React frontend calls
 - multi-format ingestion, sentence-transformer embeddings, and SQLite + ChromaDB
   persistence
 - the NumPy-vectorized forgetting-curve engine, 50–100x faster than per-chunk loops,
   which drives decay-aware search
+- FSRS review scheduling and the retention-aware ranking
 - bcrypt + JWT authentication with per-user data isolation, and the Notion OAuth
   import
-- deployment: a Vercel frontend and a Railway backend, where switching to CPU-only
-  PyTorch cut the image from 5.8 GB to about 1.5 GB
+- the June 2026 security pass: no hardcoded JWT secret, the demo account limited to
+  dev, an explicit CORS allow-list, pinned dependencies, CI with dependency scans, a
+  backup utility for both stores, and a P0 security test suite
+- deployment: the Vercel frontend, and the backend, first on Railway (where switching
+  to CPU-only PyTorch cut the image from 5.8 GB to about 1.5 GB) and now on Hugging
+  Face Spaces
+- frontend features: login and registration, the note editor, the knowledge-tree
+  dashboard and the theme switcher
 
-I also built frontend features: login and registration, the note editor, the
-knowledge-tree dashboard and the theme switcher.
+## The hackathon team
 
-## Team
-
-- [Vaishnavi Chaughule](https://github.com/vaishnavi1064)
-- [Shraddha Deshpande](https://github.com/deshpandesk8)
-- [Nikhil Pawar](https://github.com/aimsotrash)
+- [Nikhil Pawar](https://github.com/aimsotrash): backend, the forgetting-curve
+  engine, most of the frontend
+- [Shraddha Deshpande](https://github.com/deshpandesk8): the first version of the
+  React frontend
+- [Vaishnavi Chaughule](https://github.com/vaishnavi1064): the hackathon
+  intelligence package
 
 ## Stack
 
@@ -69,3 +93,19 @@ npm install
 cp .env.example .env.local      # VITE_API_BASE_URL=http://localhost:8001
 npm run dev
 ```
+
+Environment variables keep the project's original `DORY_` prefix. They are all listed
+in [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md), including the ones production needs.
+
+Tests (62: 51 backend, 11 intelligence) need only the light dependency set:
+
+```bash
+pip install -r backend/requirements-test.txt
+(cd backend && DORY_ENV=dev DORY_SKIP_WARMUP=1 python -m pytest tests/)
+DORY_ENV=dev DORY_SKIP_WARMUP=1 python -m pytest intelligence/tests/
+```
+
+## License
+
+[MIT](LICENSE). The code from the hackathon stays under the team's original notice,
+"Dory.md contributors".
