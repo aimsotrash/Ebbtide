@@ -67,7 +67,7 @@ export function LoginPage() {
               <Brain size={20} />
             </span>
             <div>
-              <p className="text-lg font-bold tracking-[-0.02em]">Dory.md</p>
+              <p className="text-lg font-bold tracking-[-0.02em]">Engram</p>
               <p className="text-sm text-background/60">The notes app that remembers with you.</p>
             </div>
           </div>
@@ -76,7 +76,7 @@ export function LoginPage() {
             <p className="app-label mb-3">Memory OS</p>
             <h1 className="text-4xl font-bold tracking-[-0.02em] leading-[1.08]">Track what you know before it quietly fades.</h1>
             <p className="mt-4 text-lg leading-8 text-background/70">
-              Dory turns files and notes into memory chunks, models retention decay, and gives you the next best review action.
+              Engram turns files and notes into memory chunks, models retention decay, and gives you the next best review action.
             </p>
           </div>
 

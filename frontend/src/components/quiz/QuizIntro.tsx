@@ -27,7 +27,7 @@ export function QuizIntro({ onStart, loading }: QuizIntroProps) {
             <p className="app-label mb-2">Adaptive quiz mode</p>
             <h1 className="text-2xl font-extrabold text-[var(--text-1)]">Strengthen what is fading.</h1>
             <p className="mt-2 text-[var(--text-2)]">
-              Dory generates questions from low-retention chunks. Correct answers boost stability; misses become review targets.
+              Engram generates questions from low-retention chunks. Correct answers boost stability; misses become review targets.
             </p>
           </div>
         </div>

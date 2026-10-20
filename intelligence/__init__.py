@@ -1,7 +1,7 @@
-"""Dory.md Intelligence Layer.
+"""Engram Intelligence Layer.
 
 An independent domain layer for the memory-science, retrieval, ranking, and LLM
-logic that powers Dory.md. It deliberately knows NOTHING about HTTP, auth, or the
+logic that powers Engram. It deliberately knows NOTHING about HTTP, auth, or the
 relational database — it takes plain inputs (text, vectors, mappings, numbers) and
 returns plain outputs. The FastAPI backend orchestrates persistence and wiring and
 consumes this package through each subpackage's public `__init__` interface.

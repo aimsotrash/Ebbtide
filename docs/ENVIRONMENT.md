@@ -1,4 +1,4 @@
-# Dory.md — Environment Variable Inventory
+# Engram — Environment Variable Inventory
 
 Authoritative list of every environment variable the system reads, where it is
 read, its default, and whether it is required for a public deployment.

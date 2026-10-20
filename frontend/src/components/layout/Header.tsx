@@ -15,7 +15,7 @@ const pageMeta: Record<string, { title: string; detail: string }> = {
   '/search': { title: 'Discovery search', detail: 'Find the right chunk before it fades.' },
   '/quiz': { title: 'Practice', detail: 'Turn weak memories into stronger ones.' },
   '/library': { title: 'Library', detail: 'Browse, organize, edit, and protect chunks.' },
-  '/notes': { title: 'Write', detail: 'Draft notes and index them into Dory.' },
+  '/notes': { title: 'Write', detail: 'Draft notes and index them into Engram.' },
   '/pomodoro': { title: 'Focus timer', detail: 'Work in sessions while your notes stay nearby.' },
   '/calendar': { title: 'Review calendar', detail: 'See when concepts are predicted to fall off.' },
   '/settings': { title: 'Settings', detail: 'Tune reminders, demo data, and account controls.' },
@@ -67,7 +67,7 @@ export function Header({ hasDiscovery, onDiscoveryClick }: HeaderProps) {
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--accent)] text-white">
               <Brain size={18} />
             </span>
-            <span className="hidden font-bold text-[var(--text-1)] sm:inline">Dory.md</span>
+            <span className="hidden font-bold text-[var(--text-1)] sm:inline">Engram</span>
           </Link>
           <div className="hidden min-w-0 border-l border-[var(--border)] pl-4 md:block">
             <p className="text-sm font-bold text-[var(--text-1)]">{meta.title}</p>
@@ -114,7 +114,7 @@ export function Header({ hasDiscovery, onDiscoveryClick }: HeaderProps) {
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--accent)] text-white">
                   <Brain size={16} />
                 </span>
-                Dory.md
+                Engram
               </span>
               <button type="button" onClick={() => setMobileNavOpen(false)} className="btn-ghost h-8 w-8 p-0" aria-label="Close navigation menu">
                 <X size={16} />
@@ -162,7 +162,7 @@ export function Header({ hasDiscovery, onDiscoveryClick }: HeaderProps) {
             <div className="mb-4 flex items-center justify-between gap-4">
               <div>
                 <h3 className="text-base font-bold text-[var(--text-1)]">Add a memory</h3>
-                <p className="text-sm text-[var(--text-3)]">Paste a fragment, idea, or note. Dory will chunk and track it.</p>
+                <p className="text-sm text-[var(--text-3)]">Paste a fragment, idea, or note. Engram will chunk and track it.</p>
               </div>
               <button type="button" onClick={() => setShowIngest(false)} className="btn-ghost h-8 w-8 p-0" title="Close">
                 <X size={16} />

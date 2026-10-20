@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "dory-intelligence"
 version = "1.0.0"
-description = "Dory.md intelligence layer: memory-science, retrieval, ranking, and LLM logic as an independent domain package."
+description = "Engram intelligence layer: memory-science, retrieval, ranking, and LLM logic as an independent domain package."
 requires-python = ">=3.11"
 dependencies = [
     "numpy",

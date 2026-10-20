@@ -39,7 +39,7 @@ FALLBACK_QUESTIONS = [
         "correct_index": 1,
     },
     {
-        "question": "Which retention score range is classified as 'Critical' in Dory.md?",
+        "question": "Which retention score range is classified as 'Critical' in Engram?",
         "options": ["0.8 – 1.0", "0.5 – 0.8", "0.2 – 0.5", "0.0 – 0.2"],
         "correct_index": 3,
     },

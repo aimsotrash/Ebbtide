@@ -1,4 +1,4 @@
-# Dory.md backend — PINNED production dependencies.
+# Engram backend — PINNED production dependencies.
 #
 # Why pinned: reproducible builds + a fixed surface for `pip-audit` (P0 dependency
 # security). Unpinned ranges let a transitive bump silently change what ships.

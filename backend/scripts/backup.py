@@ -1,4 +1,4 @@
-"""Minimum-viable backup utility for Dory.md's two on-disk stores (P0 storage
+"""Minimum-viable backup utility for Engram's two on-disk stores (P0 storage
 readiness).
 
 Snapshots, into a single timestamped directory:
@@ -107,7 +107,7 @@ def run_backup(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Back up Dory.md SQLite + Chroma stores.")
+    parser = argparse.ArgumentParser(description="Back up Engram SQLite + Chroma stores.")
     parser.add_argument("--out", help="Backup output directory (default: $DORY_BACKUP_DIR or backend/data/backups)")
     parser.add_argument("--db", help="SQLite path (default: $DORY_DB_PATH or backend/data/dory.db)")
     parser.add_argument("--chroma", help="Chroma dir (default: $DORY_CHROMA_PATH or backend/data/chroma)")

@@ -1,4 +1,4 @@
-# Dory.md — Dependency Security & Upgrade Guidance
+# Engram — Dependency Security & Upgrade Guidance
 
 ## Where dependencies live
 

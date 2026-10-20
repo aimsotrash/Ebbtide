@@ -1,4 +1,4 @@
-# Dory.md — P0 Security & Deployment Hardening Report
+# Engram — P0 Security & Deployment Hardening Report
 
 **Date:** 2026-06-07
 **Scope:** Public-deployment safety only. No new features, no UI redesign, no

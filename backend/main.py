@@ -45,11 +45,11 @@ async def lifespan(app: FastAPI):
     if os.getenv("DORY_SKIP_WARMUP") != "1":
         warm_model()
         threading.Thread(target=classify_all_uncategorized, daemon=True).start()
-    logger.info("Dory.md API started (env=%s)", os.getenv("DORY_ENV", "dev"))
+    logger.info("Engram API started (env=%s)", os.getenv("DORY_ENV", "dev"))
     yield
 
 
-app = FastAPI(title="Dory.md API", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="Engram API", version="1.0.0", lifespan=lifespan)
 
 # CORS (AUDIT P1-3 / P0 CORS hardening). The browser-facing allow-list is built
 # explicitly — there is NO wildcard, no `*.vercel.app`, and no public-IP regex in
@@ -140,7 +140,7 @@ app.include_router(seed.router, prefix="/api")
 
 @app.get("/")
 def root():
-    return {"status": "ok", "service": "Dory.md"}
+    return {"status": "ok", "service": "Engram"}
 
 
 @app.get("/livez")

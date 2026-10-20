@@ -146,7 +146,7 @@ export function NoteEditorPage() {
     setSaving(true);
     try {
       await ingestText(`# ${active.title}\n\n${active.content}`, 'note', active.title || 'note');
-      flash('ok', 'Indexed in Dory');
+      flash('ok', 'Indexed in Engram');
     } catch (e) {
       flash('err', e instanceof Error ? e.message : 'Save failed');
     } finally {

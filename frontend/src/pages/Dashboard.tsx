@@ -376,7 +376,7 @@ export function Dashboard() {
           {/* Discovery card (only renders if there's a discovery) */}
           {discovery && discovery.has_discovery && (
             <div>
-              <h2 className="mb-3 text-lg font-bold text-[var(--text-1)]">Dory found something</h2>
+              <h2 className="mb-3 text-lg font-bold text-[var(--text-1)]">Engram found something</h2>
               <motion.div
                 className="rounded-lg border border-[var(--accent-border)] bg-[var(--accent-soft)] p-4"
                 initial={{ opacity: 0, y: 4 }}

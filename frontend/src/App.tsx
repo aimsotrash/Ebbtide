@@ -51,7 +51,7 @@ function AnimatedRoutes() {
                     <Route path="*" element={
                       <div className="app-card p-10 text-center">
                         <p className="font-bold text-[var(--text-1)]">Page not found</p>
-                        <p className="mt-1 text-sm text-[var(--text-3)]">Use the sidebar to return to a Dory workspace.</p>
+                        <p className="mt-1 text-sm text-[var(--text-3)]">Use the sidebar to return to an Engram workspace.</p>
                       </div>
                     } />
                   </Routes>
