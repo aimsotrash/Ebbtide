@@ -20,6 +20,9 @@ sys.path.insert(0, str(BACKEND_ROOT.parent))
 _BOOTSTRAP_DB = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
 _BOOTSTRAP_DB.close()
 os.environ["DORY_DB_PATH"] = _BOOTSTRAP_DB.name
+# Keep Chroma out of the real store at backend/data/chroma; removed at exit.
+_CHROMA_DIR = tempfile.TemporaryDirectory()
+os.environ["DORY_CHROMA_PATH"] = _CHROMA_DIR.name
 os.environ["DORY_ENV"] = "dev"
 os.environ["DORY_SKIP_WARMUP"] = "1"
 
