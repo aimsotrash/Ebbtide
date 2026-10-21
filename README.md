@@ -97,7 +97,7 @@ npm run dev
 Environment variables keep the project's original `DORY_` prefix. They are all listed
 in [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md), including the ones production needs.
 
-Tests (62: 51 backend, 11 intelligence) need only the light dependency set:
+Tests (73: 51 backend, 22 intelligence) need only the light dependency set:
 
 ```bash
 pip install -r backend/requirements-test.txt

@@ -17,7 +17,7 @@ subpackage's public interface and could be deployed/published on its own.
 
 | Package | Responsibility | Public interface (`__init__`) |
 |---|---|---|
-| `memory/` | Ebbinghaus retention + FSRS scheduling | `calculate_retention[_batch]`, `classify_retention`, `grade`, `VALID_GRADES`, thresholds |
+| `memory/` | Ebbinghaus retention + FSRS scheduling + the agent memory store | `calculate_retention[_batch]`, `classify_retention`, `grade`, `VALID_GRADES`, thresholds, `MemoryStore`, `Policy`, `POLICIES` |
 | `embeddings/` | SentenceTransformer vectorization (lazy) | `embed_query`, `embed_texts`, `warm_model`, `get_model` |
 | `retrieval/` | ChromaDB vector store adapter | `add_chunks`, `upsert_chunk`, `query_similar`, `delete_chunk`, `count` |
 | `ranking/` | Hybrid composite scoring + display metrics | `composite_score`, `recency_bonus`, `display_stability`, `display_complexity_k` |

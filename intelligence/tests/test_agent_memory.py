@@ -1,0 +1,102 @@
+"""Agent memory store: eviction policies, ranking and strengthening.
+
+Deterministic: every call passes an explicit `now`, and the vectors are hand-made.
+"""
+
+import math
+
+import pytest
+
+from intelligence.memory import POLICIES, MemoryStore, Policy, stability
+
+DAY = 24 * 3600.0
+X, Y = [1.0, 0.0], [0.0, 1.0]
+
+
+def test_recall_ranks_by_similarity_and_refreshes_hits():
+    store = MemoryStore(POLICIES["keep-all"])
+    store.add("x", X, now=0)
+    store.add("y", Y, now=0)
+    store.add("xy", [1.0, 1.0], now=0)
+    hits = store.recall(X, k=2, now=DAY)
+    assert [(m.text, round(score, 3)) for m, score in hits] == [("x", 1.0), ("xy", 0.707)]
+    assert [(m.recall_count, m.last_recalled_at) for m in store.memories] == [(1, DAY), (0, None), (1, DAY)]
+    assert MemoryStore(POLICIES["lru"]).recall(X, k=3, now=0) == []
+
+
+@pytest.mark.parametrize("name, victim_a, victim_b", [
+    ("keep-all", None, None),
+    ("recency", "m1", "m1"),
+    ("lru", "m2", "m1"),
+    ("decay-only", "m2", "m1"),     # LRU's evictions, since S stays 1
+    ("engram-count", "m2", "m2"),   # the recall made m1 outlast the newer m2
+    ("engram-spaced", "m2", "m2"),
+])
+def test_eviction_by_policy(name, victim_a, victim_b):
+    # A: m1 is recalled after m2 is added, so m1 was used more recently.
+    a = MemoryStore(POLICIES[name], budget=2)
+    a.add("m1", X, now=0)
+    a.add("m2", Y, now=1 * DAY)
+    a.recall(X, k=1, now=2 * DAY)
+    a.add("m3", Y, now=3 * DAY)
+    # B: m1 is recalled once, then m2 is added and never recalled.
+    b = MemoryStore(POLICIES[name], budget=2)
+    b.add("m1", X, now=0)
+    b.recall(X, k=1, now=3 * DAY)
+    b.add("m2", Y, now=4 * DAY)
+    b.add("m3", Y, now=10 * DAY)
+    for store, victim in ((a, victim_a), (b, victim_b)):
+        assert {m.text for m in store.memories} == {"m1", "m2", "m3"} - {victim}
+    assert a.stats(now=3 * DAY)["budget"] == (None if name == "keep-all" else 2)
+
+
+def test_spaced_strengthening_rewards_spacing_and_count_does_not():
+    def recalled(rule, gap):
+        store = MemoryStore(Policy(evict=None, strengthen=rule))
+        memory = store.add("m", X, now=0)
+        store.recall(X, k=1, now=gap)
+        return store, memory
+
+    assert recalled("spaced", 0)[1].stability == 1.0  # recalled at R = 1: no gain
+    spaced_store, spaced = recalled("spaced", 3 * DAY)
+    assert spaced.stability == pytest.approx(15.6, abs=0.1)
+    count_store, counted = recalled("count", 3 * DAY)
+    assert counted.stability == recalled("count", 0)[1].stability == stability(1)
+    # A month after that recall, the spaced memory is still strong.
+    month_later = 33 * DAY
+    assert spaced_store.stats(month_later)["mean_retrievability"] == pytest.approx(0.81, abs=0.01)
+    assert count_store.stats(month_later)["mean_retrievability"] == pytest.approx(0.08, abs=0.01)
+
+
+@pytest.mark.parametrize("fusion", ["add", "mul"])
+def test_decay_ranking_prefers_the_stronger_of_equal_matches(fusion):
+    def order(weight):
+        store = MemoryStore(Policy(evict=None, weight=weight, fusion=fusion))
+        store.add("old", X, now=0)
+        store.add("new", X, now=5 * DAY)
+        return [m.text for m, _ in store.recall(X, k=2, now=6 * DAY)]
+
+    assert order(0.0) == ["old", "new"]  # similarity alone: ties keep insertion order
+    assert order(0.5) == ["new", "old"]
+
+
+def test_budget_forget_stats_and_guards():
+    store = MemoryStore(POLICIES["engram-spaced"], budget=3)
+    for day in range(10):
+        store.add(f"m{day}", X, now=day * DAY)
+    assert [m.text for m in store.memories] == ["m7", "m8", "m9"]
+    same_session = MemoryStore(POLICIES["recency"], budget=2)
+    for text in ("t1", "t2", "t3"):  # one timestamp: the earliest turn goes first
+        same_session.add(text, X, now=0)
+    assert [m.text for m in same_session.memories] == ["t2", "t3"]
+    assert store.forget(store.memories[0].id) and not store.forget(-1)
+    assert store.stats(now=18 * DAY) == {
+        "count": 2,
+        "budget": 3,
+        "evicted": 7,
+        "mean_retrievability": pytest.approx((math.exp(-10 / 9) + math.exp(-1)) / 2),
+    }
+    with pytest.raises(ValueError):
+        MemoryStore(POLICIES["lru"], budget=0)
+    with pytest.raises(ValueError):
+        Policy(evict="oldest")
