@@ -101,14 +101,16 @@ class Memory:
 class MemoryStore:
     """At most `budget` memories (None = no limit), managed by one policy."""
 
-    def __init__(self, policy: Policy, budget: int | None = None):
+    def __init__(self, policy: Policy, budget: int | None = None, memories=(), next_id: int = 1):
+        """`memories` (in insertion order) and `next_id` restore a saved store; new ids
+        start past both, so a deleted id is never handed out again."""
         if budget is not None and budget < 1:
             raise ValueError(f"budget must be at least 1, got {budget!r}")
         self.policy = policy
         self.budget = None if policy.evict is None else budget  # keep-all has no budget
-        self.memories: list[Memory] = []  # insertion order, which breaks every tie
+        self.memories: list[Memory] = list(memories)  # insertion order, which breaks every tie
         self.evicted = 0
-        self._ids = itertools.count(1)
+        self._ids = itertools.count(max([next_id, *(m.id + 1 for m in self.memories)]))
 
     def add(self, text: str, embedding, now: float, source: dict | None = None) -> Memory:
         """Store a memory, evicting first if the store is full."""
@@ -147,8 +149,12 @@ class MemoryStore:
                 return True
         return False
 
+    def retrievability(self, now: float) -> np.ndarray:
+        """R of every memory at `now`, in insertion order."""
+        return np.exp(self._log_r(now))
+
     def stats(self, now: float) -> dict:
-        r = np.exp(self._log_r(now))
+        r = self.retrievability(now)
         return {
             "count": len(self.memories),
             "budget": self.budget,

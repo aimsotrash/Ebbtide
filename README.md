@@ -94,15 +94,18 @@ cp .env.example .env.local      # VITE_API_BASE_URL=http://localhost:8001
 npm run dev
 ```
 
-Environment variables keep the project's original `DORY_` prefix. They are all listed
-in [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md), including the ones production needs.
+The app's environment variables keep the project's original `DORY_` prefix; those of
+the agent-memory MCP server ([`engram_mcp/`](engram_mcp/README.md)) use `ENGRAM_`. They
+are all listed in [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md), including the ones
+production needs.
 
-Tests (73: 51 backend, 22 intelligence) need only the light dependency set:
+Tests (74: 51 backend, 22 intelligence, 1 MCP server) need only the light dependency set:
 
 ```bash
 pip install -r backend/requirements-test.txt
 (cd backend && DORY_ENV=dev DORY_SKIP_WARMUP=1 python -m pytest tests/)
 DORY_ENV=dev DORY_SKIP_WARMUP=1 python -m pytest intelligence/tests/
+python -m pytest engram_mcp/tests/
 ```
 
 ## License
