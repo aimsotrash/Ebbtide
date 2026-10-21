@@ -43,6 +43,7 @@ cd frontend && npm audit --audit-level=high
    ```bash
    cd backend && DORY_ENV=dev DORY_SKIP_WARMUP=1 python -m pytest tests/ -v
    DORY_ENV=dev python -m pytest intelligence/tests/ -v
+   python -m pytest engram_mcp/tests/ -v
    ```
 4. `pip-audit` to confirm no new advisories.
 5. Commit `requirements*.txt` together.
