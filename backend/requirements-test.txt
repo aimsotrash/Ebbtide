@@ -1,11 +1,11 @@
-# Minimal, PINNED dependency set to run the backend, intelligence and MCP server
-# test suites.
+# Minimal, PINNED dependency set to run the backend, intelligence, MCP server and
+# benchmark test suites.
 #
 # Excludes torch/sentence-transformers because the tests skip the embedding
 # warm-up (DORY_SKIP_WARMUP=1) and stub embeddings, so the heavy ML stack is not
 # needed for CI. These exact versions were verified to install and pass the full
-# suite (51 backend + 22 intelligence + 1 MCP server tests) on Python 3.14 and
-# 3.12 locally; CI uses 3.12.
+# suite (51 backend + 22 intelligence + 1 MCP server + 3 benchmark tests) on
+# Python 3.14 and 3.12 locally; CI uses 3.12.
 #
 # Pins keep CI reproducible and let `pip-audit` evaluate a fixed surface.
 # To refresh: create a clean venv, install, run the suite, then `pip freeze`.

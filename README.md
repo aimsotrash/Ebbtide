@@ -99,13 +99,14 @@ the agent-memory MCP server ([`engram_mcp/`](engram_mcp/README.md)) use `ENGRAM_
 are all listed in [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md), including the ones
 production needs.
 
-Tests (74: 51 backend, 22 intelligence, 1 MCP server) need only the light dependency set:
+Tests (77: 51 backend, 22 intelligence, 1 MCP server, 3 benchmark) need only the light
+dependency set:
 
 ```bash
 pip install -r backend/requirements-test.txt
 (cd backend && DORY_ENV=dev DORY_SKIP_WARMUP=1 python -m pytest tests/)
 DORY_ENV=dev DORY_SKIP_WARMUP=1 python -m pytest intelligence/tests/
-python -m pytest engram_mcp/tests/
+python -m pytest engram_mcp/tests/ bench/
 ```
 
 ## License

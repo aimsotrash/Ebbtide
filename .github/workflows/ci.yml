@@ -1,7 +1,7 @@
 name: CI
 
 # Runs on every push/PR to main:
-#   - backend + intelligence + MCP server pytest (tests)
+#   - backend, intelligence, MCP server and benchmark pytest (tests)
 #   - pip-audit                               (backend dependency security)
 #   - frontend tsc / lint / build             (build validation)
 #   - npm audit                               (frontend dependency security)
@@ -38,6 +38,9 @@ jobs:
 
       - name: MCP server tests
         run: python -m pytest engram_mcp/tests/ -v
+
+      - name: Benchmark harness tests
+        run: python -m pytest bench/ -v
 
       # Dependency vulnerability scan. Non-blocking for now so a transitive
       # advisory surfaces without wedging CI; remove continue-on-error to gate.
