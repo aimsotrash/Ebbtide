@@ -10,7 +10,7 @@ repository on June 7, 2026. The team repository,
 [vaishnavi1064/Dory.md](https://github.com/vaishnavi1064/Dory.md), has since gone its
 own way. The memory for AI agents, from October 2026, is my own work.
 
-**Live:** [dory-md-fork.vercel.app](https://dory-md-fork.vercel.app)
+**Live:** [aimsotrash-engram.vercel.app](https://aimsotrash-engram.vercel.app)
 
 ## Memory for AI agents
 
