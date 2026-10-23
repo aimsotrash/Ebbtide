@@ -146,6 +146,12 @@ python -m bench.longmemeval run     # writes bench/RESULTS.md
 python -m bench.locomo              # writes bench/RESULTS-locomo.md
 ```
 
+The landing page for the MCP server lives in `site/` (Vite, React and Tailwind):
+
+```bash
+cd site && npm install && npm run dev   # http://localhost:5173
+```
+
 The app's environment variables keep the project's original `DORY_` prefix; those of
 the agent-memory MCP server ([`engram_mcp/`](engram_mcp/README.md)) use `ENGRAM_`. They
 are all listed in [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md), including the ones
