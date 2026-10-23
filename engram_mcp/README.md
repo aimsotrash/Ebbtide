@@ -47,7 +47,9 @@ ones fade more slowly. It listens on 127.0.0.1 only and loads nothing from the i
 
 For a demo that shouldn't touch your real memories, point both at a scratch database: set
 `ENGRAM_DB=/tmp/engram-demo.db` for the panel, and pass `-e ENGRAM_DB=/tmp/engram-demo.db`
-when you register the server.
+when you register the server. Once a first run has downloaded the embedding model, passing
+`-e HF_HUB_OFFLINE=1` as well keeps the server off the network entirely, which helps on
+unreliable venue Wi-Fi.
 
 ## Configuration
 

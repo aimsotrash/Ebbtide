@@ -57,19 +57,24 @@ EMBEDDINGS = DATA / "longmemeval_s_minilm.npy"  # one row per text, in texts() o
 CHUNK = 10_000
 
 
-def load() -> list[dict]:
-    if not FILE.exists():
+def fetch(path: Path, url: str, sha256: str):
+    """The pinned dataset at `path`, downloaded if missing and checked by SHA-256."""
+    if not path.exists():
         DATA.mkdir(exist_ok=True)
-        part = FILE.with_suffix(".part")
-        urllib.request.urlretrieve(URL, part)
-        part.rename(FILE)
+        part = path.with_suffix(".part")
+        urllib.request.urlretrieve(url, part)
+        part.rename(path)
     digest = hashlib.sha256()
-    with FILE.open("rb") as f:
+    with path.open("rb") as f:
         while block := f.read(1 << 20):
             digest.update(block)
-    if digest.hexdigest() != SHA256:
-        raise SystemExit(f"{FILE} does not match the pinned SHA-256; delete it and run again")
-    return json.loads(FILE.read_text())
+    if digest.hexdigest() != sha256:
+        raise SystemExit(f"{path} does not match the pinned SHA-256; delete it and run again")
+    return json.loads(path.read_text())
+
+
+def load() -> list[dict]:
+    return fetch(FILE, URL, SHA256)
 
 
 def texts(data: list[dict]) -> list[str]:
@@ -78,12 +83,12 @@ def texts(data: list[dict]) -> list[str]:
     return list(dict.fromkeys([*turns, *(q["question"] for q in data)]))
 
 
-def embed(data: list[dict]) -> None:
-    """Embed every text once, CHUNK at a time, so an interrupted run resumes."""
+def embed(all_texts: list[str], out: Path) -> None:
+    """Embed every text once into `out`, CHUNK at a time, so an interrupted run resumes."""
     from intelligence.embeddings import get_model  # heavy: loads torch
 
-    all_texts, model = texts(data), get_model()
-    parts = DATA / "embedding_parts"
+    model = get_model()
+    parts = out.with_suffix(".parts")
     parts.mkdir(exist_ok=True)
     starts = range(0, len(all_texts), CHUNK)
     for start in starts:
@@ -93,7 +98,7 @@ def embed(data: list[dict]) -> None:
             np.save(parts / "partial.npy", vectors.astype(np.float32))
             (parts / "partial.npy").rename(path)
         print(f"embedded {min(start + CHUNK, len(all_texts)):,} / {len(all_texts):,}", flush=True)
-    np.save(EMBEDDINGS, np.concatenate([np.load(parts / f"{s:07d}.npy") for s in starts]))
+    np.save(out, np.concatenate([np.load(parts / f"{s:07d}.npy") for s in starts]))
     for path in parts.iterdir():
         path.unlink()
     parts.rmdir()
@@ -147,7 +152,8 @@ def plan(q: dict, row: dict[str, int]) -> Plan:
                 max(_timestamp(q["question_date"]), times[-1] + 1))
 
 
-def replay(p: Plan, policy: Policy, budget: int | None, live_k: int, emb: np.ndarray) -> dict:
+def fill(p: Plan, policy: Policy, budget: int | None, live_k: int, emb: np.ndarray) -> tuple[MemoryStore, float]:
+    """Replay the history into a store. Returns it and the mean ms of the agent's recalls."""
     store = MemoryStore(policy, budget)
     recall_seconds, recalls = 0.0, 0
     for i, row in enumerate(p.rows):
@@ -158,16 +164,23 @@ def replay(p: Plan, policy: Policy, budget: int | None, live_k: int, emb: np.nda
             recall_seconds += time.perf_counter() - started
             recalls += 1
         store.add("", vector, p.times[i], source={"turn": i})
+    return store, 1000 * recall_seconds / max(recalls, 1)
+
+
+def ask(store: MemoryStore, q: Plan, emb: np.ndarray) -> dict:
+    """Score the store's ranking for a question. Only looks: nothing is strengthened."""
+    hits = store.recall(emb[q.question_row], len(store.memories), q.question_time, refresh=False)
     kept = {m.source["turn"] for m in store.memories}
-    started = time.perf_counter()
-    hits = store.recall(emb[p.question_row], len(store.memories), p.question_time)
-    recall_seconds += time.perf_counter() - started
     return {
-        **score([m.source["turn"] for m, _ in hits], p),
-        "evidence_kept": len(p.evidence & kept) / len(p.evidence) if p.evidence else None,
+        **score([m.source["turn"] for m, _ in hits], q),
+        "evidence_kept": len(q.evidence & kept) / len(q.evidence) if q.evidence else None,
         "memories": len(store.memories),
-        "recall_ms": 1000 * recall_seconds / (recalls + 1),
     }
+
+
+def replay(p: Plan, policy: Policy, budget: int | None, live_k: int, emb: np.ndarray) -> dict:
+    store, recall_ms = fill(p, policy, budget, live_k, emb)
+    return {**ask(store, p, emb), "recall_ms": recall_ms}
 
 
 def score(ranked: list[int], p: Plan) -> dict:
@@ -253,26 +266,31 @@ def _pct(value: float | None) -> str:
     return "–" if value is None else f"{100 * value:.1f}"
 
 
+ORDER = ["keep-all", "keep-all, decay-ranked", "recency", "lru", "decay-only", "engram-count", "engram-spaced"]
+
+
+def label(key: tuple) -> str:
+    return key[0] if key[1] is None else f"{key[0]} @ {key[1]:.0%}"
+
+
+def table(header: list[str], lines: list[list[str]]) -> str:
+    return "\n".join([f"| {' | '.join(header)} |", f"|{'---|' * len(header)}", *(f"| {' | '.join(line)} |" for line in lines)])
+
+
+def by_budget(results: dict, metric: str) -> str:
+    """One row per policy, one column per budget; keep-all's single result repeats."""
+    lines = []
+    for name in ORDER:
+        keys = sorted((k for k in results if k[0] == name), key=lambda k: k[1] or 0)
+        cells = [_pct(mean(results[k], metric)) for k in keys]
+        lines.append([name, *(cells * len(BUDGETS) if len(keys) == 1 else cells)])
+    return table(["policy", *(f"{f:.0%} budget" for f in BUDGETS)], lines)
+
+
 def _report(counts: dict, chosen: dict, configs: dict, results: dict, minutes: float) -> str:
-    rows = list(configs)  # (name, budget fraction), in the order of the policy ladder
-    order = ["keep-all", "keep-all, decay-ranked", "recency", "lru", "decay-only", "engram-count", "engram-spaced"]
-    rows.sort(key=lambda key: (order.index(key[0]), key[1] or 0))
+    rows = sorted(configs, key=lambda key: (ORDER.index(key[0]), key[1] or 0))  # the policy ladder
     test = results[LIVE_K]
     types = sorted({p.qtype for p in _PLANS})
-
-    def label(key):
-        return key[0] if key[1] is None else f"{key[0]} @ {key[1]:.0%}"
-
-    def table(header, lines):
-        return "\n".join([f"| {' | '.join(header)} |", f"|{'---|' * len(header)}", *(f"| {' | '.join(line)} |" for line in lines)])
-
-    def by_budget(res, metric):
-        lines = []
-        for name in order:
-            keys = [k for k in rows if k[0] == name]
-            cells = [_pct(mean(res[k], metric)) for k in keys]
-            lines.append([name, *(cells * 3 if len(keys) == 1 else cells)])
-        return table(["policy", *(f"{f:.0%} budget" for f in BUDGETS)], lines)
 
     metrics = [f"turn_all@{k}" for k in KS] + [f"turn_any@{k}" for k in KS] + ["session_all@10", "session_any@10",
                "evidence_kept", "latest@10"]
@@ -301,9 +319,20 @@ def _report(counts: dict, chosen: dict, configs: dict, results: dict, minutes: f
                 losses.append(f"{t} at {f:.0%}")
         loss_lines.append([t, *cells])
 
+    def against_lru(name, metric, f):
+        diffs = [a[metric] - b[metric] for a, b in zip(test[(name, f)], test[("lru", f)]) if a.get(metric) is not None]
+        lo, hi = _bootstrap(diffs)
+        return f"{100 * sum(diffs) / len(diffs):+.1f} [{100 * lo:+.1f}, {100 * hi:+.1f}]"
+
+    posthoc = table(["variant", "metric", *(f"{f:.0%} budget" for f in BUDGETS)], [
+        [name, metric, *(against_lru(name, metric, f) for f in BUDGETS)]
+        for name in ("engram-count", "engram-spaced")
+        for metric in (PRIMARY, "session_all@10", "evidence_kept", "latest@10")
+    ])
+
     settings = table(["policy", "budget", "fusion", "weight", "decay scale (h)", f"dev {PRIMARY}"], [
         [n, "none" if f is None else f"{f:.0%}", p.fusion, f"{p.weight:g}", f"{p.scale_hours:g}", _pct(v)]
-        for (n, f), (p, v) in sorted(chosen.items(), key=lambda kv: (order.index(kv[0][0]), kv[0][1] or 0))
+        for (n, f), (p, v) in sorted(chosen.items(), key=lambda kv: (ORDER.index(kv[0][0]), kv[0][1] or 0))
     ])
 
     return f"""# LongMemEval: should an agent forget?
@@ -348,13 +377,21 @@ keep-all ignores the budget, so its row repeats.
 
 ## Where engram-spaced loses
 
-engram-spaced is the variant named in advance as the headline, since it is the MCP server's
-default. Each cell is engram-spaced minus whichever of recency and LRU did better in that cell, in
-{PRIMARY} points, with a 95% paired bootstrap interval:
+engram-spaced was named in advance as the headline. Each cell is engram-spaced minus whichever
+of recency and LRU did better in that cell, in {PRIMARY} points, with a 95% paired bootstrap
+interval:
 
 {table(["question type", *(f"{f:.0%} budget" for f in BUDGETS)], loss_lines)}
 
 {"engram-spaced trails in: " + ", ".join(losses) + "." if losses else "engram-spaced trails nowhere."}
+
+## Added after seeing the results: both variants against LRU
+
+engram-count did better than the headline variant, so both are compared with LRU here, the
+strongest baseline, on the metrics that separate them, with the same 95% paired intervals.
+These comparisons were not named in advance and many were made, so read them as exploratory.
+
+{posthoc}
 
 ## Settings picked on dev
 
@@ -409,7 +446,8 @@ def main() -> None:
     parser.add_argument("command", choices=["embed", "run"])
     args = parser.parse_args()
     if args.command == "embed":
-        embed(load())
+        data = load()
+        embed(texts(data), EMBEDDINGS)
     else:
         run(load())  # no reference kept here, so run() can free the JSON before it forks
 
