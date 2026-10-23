@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Engram memory</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --fg: #1f2328; --muted: #62666d; --line: #e2e2de;
+    --bar: #5b7aa6; --bar-bg: #e6e6e1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #161719; --fg: #e6e6e3; --muted: #a0a2a7; --line: #2b2c30;
+      --bar: #86a3cf; --bar-bg: #2b2c30;
+    }
+  }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 48px; }
+  h1 { font-size: 18px; font-weight: 600; margin: 0; }
+  .stats { color: var(--muted); font-size: 13px; margin: 4px 0 24px; }
+  .ahead { display: flex; gap: 12px; align-items: center; color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+  .ahead input { flex: 1; accent-color: var(--bar); }
+  .ahead output { min-width: 72px; text-align: right; }
+  ol { list-style: none; padding: 0; margin: 0; }
+  li { padding: 12px 0; border-top: 1px solid var(--line); transition: opacity .4s; }
+  .text { margin: 0 0 6px; overflow-wrap: anywhere; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; color: var(--muted); font-size: 12px; }
+  .bar { width: 88px; height: 4px; border-radius: 2px; background: var(--bar-bg); overflow: hidden; }
+  .bar span { display: block; height: 100%; background: var(--bar); transition: width .4s; }
+  .empty { color: var(--muted); border-top: 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Engram</h1>
+  <p class="stats" id="stats" aria-live="polite">Loading…</p>
+  <label class="ahead">Look ahead
+    <input id="ahead" type="range" min="0" max="60" value="0">
+    <output id="ahead-label">today</output>
+  </label>
+  <ol id="list"></ol>
+</main>
+<script>
+  const list = document.getElementById("list");
+  const stats = document.getElementById("stats");
+  const ahead = document.getElementById("ahead");
+  const aheadLabel = document.getElementById("ahead-label");
+
+  function item(m) {
+    const li = document.createElement("li");
+    li.style.opacity = 0.65 + 0.35 * m.strength;  // weak memories fade, but stay readable
+    const text = document.createElement("p");
+    text.className = "text";
+    text.textContent = m.text;  // agent-written text: never parsed as HTML
+    const bar = document.createElement("div");
+    bar.className = "bar";
+    bar.setAttribute("aria-hidden", "true");
+    const fill = document.createElement("span");
+    fill.style.width = `${100 * m.strength}%`;
+    bar.append(fill);
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    const parts = [`strength ${Math.round(100 * m.strength)}%`, `half-life ${m.half_life_days} d`,
+                   `recalled ${m.recalls}×`, `added ${m.added.slice(0, 10)}`, ...m.tags.map(t => `#${t}`)];
+    meta.append(bar, ...parts.map(p => Object.assign(document.createElement("span"), {textContent: p})));
+    li.append(text, meta);
+    return li;
+  }
+
+  async function refresh() {
+    const days = Number(ahead.value);
+    aheadLabel.textContent = days ? `in ${days} day${days === 1 ? "" : "s"}` : "today";
+    let data;
+    try {
+      data = await (await fetch(`/memories?ahead=${days}`)).json();
+    } catch {
+      stats.textContent = "Can't reach the panel server. Is python -m engram_mcp.panel running?";
+      return;
+    }
+    const n = data.memories.length;
+    const mean = n ? data.memories.reduce((sum, m) => sum + m.strength, 0) / n : 0;
+    stats.textContent = [`${n} ${n === 1 ? "memory" : "memories"}`, `budget ${data.budget ?? "none"}`,
+                         `policy ${data.policy}`, ...(n ? [`mean strength ${Math.round(100 * mean)}%`] : [])].join(" · ");
+    if (!n) {
+      const li = document.createElement("li");
+      li.className = "empty";
+      li.textContent = "No memories yet. Ask your agent to remember something.";
+      list.replaceChildren(li);
+      return;
+    }
+    list.replaceChildren(...data.memories.map(item));
+  }
+
+  ahead.addEventListener("input", refresh);
+  refresh();
+  setInterval(refresh, 2000);
+</script>
+</body>
+</html>

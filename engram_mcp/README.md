@@ -33,12 +33,28 @@ The first `remember` or `recall` in a session takes about 5 seconds while the em
 model (`all-MiniLM-L6-v2`) loads, and the very first run also downloads it (~90 MB).
 After that, a call takes about 10 ms.
 
+## Panel
+
+```bash
+.venv/bin/python -m engram_mcp.panel        # then open http://127.0.0.1:8765
+```
+
+A quiet local page beside the agent: every memory, strongest first, with its strength,
+half-life and recall count. It reads the same database read-only every 2 seconds, so a
+`remember`, a `recall` or an eviction shows up as it happens. The look-ahead slider shows
+how strong each memory would be after that many more days without a recall: the recalled
+ones fade more slowly. It listens on 127.0.0.1 only and loads nothing from the internet.
+
+For a demo that shouldn't touch your real memories, point both at a scratch database: set
+`ENGRAM_DB=/tmp/engram-demo.db` for the panel, and pass `-e ENGRAM_DB=/tmp/engram-demo.db`
+when you register the server.
+
 ## Configuration
 
 | Variable | Default | Purpose |
 |---|---|---|
 | `ENGRAM_DB` | `~/.local/share/engram/memory.db` | SQLite file holding the memories and their embeddings. |
-| `ENGRAM_POLICY` | `engram-spaced` | A policy name from `intelligence.memory.POLICIES`. |
+| `ENGRAM_POLICY` | `engram-count` | A policy name from `intelligence.memory.POLICIES`. The default won on the benchmark's dev split; see [`bench/RESULTS.md`](../bench/RESULTS.md). |
 | `ENGRAM_BUDGET` | `1000` | The most memories kept. `keep-all` ignores it. |
 
 Pass them with `-e` when you register the server. Each tool call is one SQLite
@@ -50,5 +66,6 @@ transaction, so two agents can share one database safely.
 python -m pytest engram_mcp/tests/
 ```
 
-It calls every tool through an in-process MCP client, with a stub embedder and a fake
-clock, so it needs only `backend/requirements-test.txt`, not the embedding model.
+They call every tool through an in-process MCP client and fetch the panel through its
+HTTP handler, with a stub embedder and a fake clock, so they need only
+`backend/requirements-test.txt`, not the embedding model.

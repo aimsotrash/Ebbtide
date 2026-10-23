@@ -21,6 +21,7 @@ def test_recall_ranks_by_similarity_and_refreshes_hits():
     hits = store.recall(X, k=2, now=DAY)
     assert [(m.text, round(score, 3)) for m, score in hits] == [("x", 1.0), ("xy", 0.707)]
     assert [(m.recall_count, m.last_recalled_at) for m in store.memories] == [(1, DAY), (0, None), (1, DAY)]
+    assert store.recall(X, k=1, now=2 * DAY, refresh=False)[0][0].recall_count == 1  # a look changes nothing
     assert MemoryStore(POLICIES["lru"]).recall(X, k=3, now=0) == []
 
 

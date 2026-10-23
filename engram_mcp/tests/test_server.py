@@ -58,11 +58,11 @@ def test_tools_round_trip(tmp_path, monkeypatch):
         (4, "remember", {"text": "Green tea after lunch"}),
     ]))
     assert [r.structured_content for r in second] == [
-        {"memories": 2, "budget": 2, "policy": "engram-spaced", "mean_strength": 0.817, "stored_ever": 2},
+        {"memories": 2, "budget": 2, "policy": "engram-count", "mean_strength": 0.781, "stored_ever": 2},
         {"id": 3, "evicted": [2]},
         {"result": True},
         {"result": False},
         {"id": 4, "evicted": []},  # id 3 was deleted, and is not handed out again
     ]
     rows = sqlite3.connect(db).execute("SELECT id, round(stability, 1), recall_count FROM memories ORDER BY id").fetchall()
-    assert rows == [(1, 15.6, 1), (4, 1.0, 0)]
+    assert rows == [(1, 1.3, 1), (4, 1.0, 0)]  # one recall: S = 1 + 0.5 ln 2

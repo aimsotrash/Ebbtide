@@ -66,8 +66,9 @@ class Policy:
             raise ValueError(f"invalid policy: {self}")
 
 
-# Placeholder until the benchmark picks it on the dev split.
-DECAY_WEIGHT = 0.1
+# Picked on the LongMemEval dev split: similarity alone ranked best almost everywhere, so
+# fading decides what is evicted, not the order of a recall (bench/RESULTS.md).
+DECAY_WEIGHT = 0.0
 
 # Each step down the list changes one thing. With S fixed at 1, lowest-R eviction is
 # exactly LRU's order, so decay-only vs lru measures the ranking term alone, and
@@ -121,9 +122,10 @@ class MemoryStore:
         self.memories.append(memory)
         return memory
 
-    def recall(self, query, k: int, now: float) -> list[tuple[Memory, float]]:
+    def recall(self, query, k: int, now: float, refresh: bool = True) -> list[tuple[Memory, float]]:
         """The k best memories for a query embedding as (memory, score), best first.
-        Each one returned is refreshed, and strengthened if the policy says so."""
+        Each one returned is refreshed, and strengthened if the policy says so, unless
+        `refresh` is False: a look that leaves every memory as it was."""
         if not self.memories or k < 1:
             return []
         # ponytail: restacks every embedding per call, O(n·d); keep one growing
@@ -137,7 +139,8 @@ class MemoryStore:
         hits = []
         for i in np.argsort(-scores, kind="stable")[:k]:
             memory = self.memories[i]
-            self._refresh(memory, math.exp(log_r[i]), now)
+            if refresh:
+                self._refresh(memory, math.exp(log_r[i]), now)
             hits.append((memory, float(scores[i])))
         return hits
 

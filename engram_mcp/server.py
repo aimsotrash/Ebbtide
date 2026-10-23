@@ -6,7 +6,7 @@ what changed. Nothing is kept between calls, so two agents sharing a database (t
 Claude Code sessions, say) can't overwrite each other's memories.
 
   ENGRAM_DB      SQLite file, default ~/.local/share/engram/memory.db
-  ENGRAM_POLICY  a name from intelligence.memory.POLICIES, default engram-spaced
+  ENGRAM_POLICY  a name from intelligence.memory.POLICIES, default engram-count
   ENGRAM_BUDGET  most memories kept, default 1000
 """
 
@@ -55,7 +55,7 @@ mcp = MCPServer(
 
 def _config() -> tuple[Path, str, int]:
     db = Path(os.environ.get("ENGRAM_DB", "~/.local/share/engram/memory.db")).expanduser()
-    policy = os.environ.get("ENGRAM_POLICY", "engram-spaced")
+    policy = os.environ.get("ENGRAM_POLICY", "engram-count")
     if policy not in POLICIES:
         raise ValueError(f"ENGRAM_POLICY must be one of {sorted(POLICIES)}, got {policy!r}")
     return db, policy, int(os.environ.get("ENGRAM_BUDGET", "1000"))
@@ -64,6 +64,19 @@ def _config() -> tuple[Path, str, int]:
 def _stored_ever(conn: sqlite3.Connection) -> int:
     row = conn.execute("SELECT seq FROM sqlite_sequence WHERE name = 'memories'").fetchone()
     return row[0] if row else 0
+
+
+def _load(conn: sqlite3.Connection, policy: str, budget: int) -> MemoryStore:
+    rows = conn.execute(
+        "SELECT id, text, embedding, created_at, last_recalled_at, stability, recall_count,"
+        " source FROM memories ORDER BY id"
+    ).fetchall()
+    memories = [
+        Memory(i, text, np.frombuffer(emb, np.float32), created, recalled, s, n,
+               json.loads(source) if source else None)
+        for i, text, emb, created, recalled, s, n, source in rows
+    ]
+    return MemoryStore(POLICIES[policy], budget, memories, next_id=_stored_ever(conn) + 1)
 
 
 @contextmanager
@@ -75,16 +88,7 @@ def _store():
     try:
         conn.execute(_SCHEMA)
         conn.execute("BEGIN IMMEDIATE")  # one writer at a time, across processes too
-        rows = conn.execute(
-            "SELECT id, text, embedding, created_at, last_recalled_at, stability, recall_count,"
-            " source FROM memories ORDER BY id"
-        ).fetchall()
-        memories = [
-            Memory(i, text, np.frombuffer(emb, np.float32), created, recalled, s, n,
-                   json.loads(source) if source else None)
-            for i, text, emb, created, recalled, s, n, source in rows
-        ]
-        yield conn, MemoryStore(POLICIES[policy], budget, memories, next_id=_stored_ever(conn) + 1)
+        yield conn, _load(conn, policy, budget)
         conn.execute("COMMIT")
     finally:
         if conn.in_transaction:
