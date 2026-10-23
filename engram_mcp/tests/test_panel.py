@@ -43,9 +43,11 @@ def test_panel_lists_strengths_and_looks_ahead(tmp_path, monkeypatch):
     finally:
         httpd.shutdown()
 
-    assert (today["policy"], today["budget"]) == ("engram-count", 1000)
+    assert (today["policy"], today["budget"], today["goes_first"]) == ("engram-count", 1000, None)
     tea, cat = today["memories"]  # strongest first: the tea memory was just recalled
     assert (tea["text"], tea["tags"], tea["strength"], tea["recalls"]) == ("Green tea after lunch", ["habit"], 1.0, 1)
     assert (cat["strength"], cat["half_life_days"]) == (0.717, 6.2)  # e^(-72 h / 216 h); ln 2 x 9 days
     assert tea["half_life_days"] == 8.4  # one recall: S = 1 + 0.5 ln 2
     assert [m["strength"] for m in week["memories"]] == [0.561, 0.329]  # the recalled one fades slower
+    monkeypatch.setenv("ENGRAM_BUDGET", "2")  # now full: the next add would drop the weaker memory
+    assert panel.snapshot(clock.now)["goes_first"] == cat["id"]

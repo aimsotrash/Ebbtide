@@ -169,14 +169,20 @@ class MemoryStore:
         hours = np.array([max(now - m.used_at, 0.0) for m in self.memories]) / 3600
         return -hours / (np.array([m.stability for m in self.memories]) * self.policy.scale_hours)
 
-    def _evict(self, now: float) -> None:
+    def next_eviction(self, now: float) -> Memory | None:
+        """The memory the policy would evict at `now`, or None if it never evicts."""
+        if self.policy.evict is None or not self.memories:
+            return None
         if self.policy.evict == "created":
             keys = [m.created_at for m in self.memories]
         elif self.policy.evict == "used":
             keys = [m.used_at for m in self.memories]
         else:
             keys = self._log_r(now)
-        del self.memories[int(np.argmin(keys))]  # first minimum: the oldest insert loses ties
+        return self.memories[int(np.argmin(keys))]  # first minimum: the oldest insert loses ties
+
+    def _evict(self, now: float) -> None:
+        self.memories.remove(self.next_eviction(now))
         self.evicted += 1
 
     def _refresh(self, memory: Memory, r: float, now: float) -> None:

@@ -45,7 +45,9 @@ def test_eviction_by_policy(name, victim_a, victim_b):
     b.add("m1", X, now=0)
     b.recall(X, k=1, now=3 * DAY)
     b.add("m2", Y, now=4 * DAY)
+    named = b.next_eviction(10 * DAY)
     b.add("m3", Y, now=10 * DAY)
+    assert (named and named.text) == victim_b  # it names exactly what the add then removed
     for store, victim in ((a, victim_a), (b, victim_b)):
         assert {m.text for m in store.memories} == {"m1", "m2", "m3"} - {victim}
     assert a.stats(now=3 * DAY)["budget"] == (None if name == "keep-all" else 2)

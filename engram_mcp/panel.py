@@ -33,15 +33,19 @@ def snapshot(now: float, ahead_days: float = 0.0) -> dict:
     if db.exists():
         with closing(sqlite3.connect(db.as_uri() + "?mode=ro", uri=True)) as conn:
             store = _load(conn, policy, budget)
-    hours = store.policy.scale_hours
+    hours, when = store.policy.scale_hours, now + ahead_days * 86400
+    ranked = sorted(zip(store.retrievability(when), store.memories), key=lambda pair: -pair[0])  # exact strength
     rows = [
         {"id": m.id, "text": m.text, "tags": (m.source or {}).get("tags", []), "strength": round(float(r), 3),
          "half_life_days": round(math.log(2) * m.stability * hours / 24, 1), "recalls": m.recall_count,
          "added": _iso(m.created_at)}
-        for m, r in zip(store.memories, store.retrievability(now + ahead_days * 86400))
+        for r, m in ranked
     ]
-    rows.sort(key=lambda row: -row["strength"])
-    return {"policy": policy, "budget": store.budget, "ahead_days": ahead_days, "memories": rows}
+    # Only a full store evicts, and the policy decides which memory: the next add removes this one.
+    full = store.budget is not None and len(store.memories) >= store.budget
+    victim = store.next_eviction(when) if full else None
+    return {"policy": policy, "budget": store.budget, "ahead_days": ahead_days, "memories": rows,
+            "goes_first": victim.id if victim else None}
 
 
 class _Handler(BaseHTTPRequestHandler):
