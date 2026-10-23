@@ -53,3 +53,6 @@ backend/.testvenv/
 
 # Local Claude Code settings
 .claude/settings.local.json
+
+# Benchmark datasets and results (bench/): downloaded, never committed
+/data/

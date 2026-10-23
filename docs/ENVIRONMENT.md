@@ -43,6 +43,14 @@ Templates: [`backend/.env.example`](../backend/.env.example),
 > Vite inlines `VITE_*` vars at build time and exposes them in the browser
 > bundle — never put secrets here.
 
+## MCP server (`engram_mcp/`)
+
+| Variable | Required? | Default | Read in | Purpose |
+|---|---|---|---|---|
+| `ENGRAM_DB` | Optional | `~/.local/share/engram/memory.db` | `engram_mcp/server.py` | SQLite file holding the agent's memories and their embeddings. Separate from `DORY_DB_PATH`. |
+| `ENGRAM_POLICY` | Optional | `engram-count` | `engram_mcp/server.py` | A policy name from `intelligence.memory.POLICIES`. The server refuses to start on an unknown name. |
+| `ENGRAM_BUDGET` | Optional | `1000` | `engram_mcp/server.py` | The most memories kept; the policy evicts past it. |
+
 ---
 
 ## Minimum required for a public production deployment

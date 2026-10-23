@@ -7,7 +7,8 @@ returns plain outputs. The FastAPI backend orchestrates persistence and wiring a
 consumes this package through each subpackage's public `__init__` interface.
 
 Subpackages:
-  memory      Ebbinghaus retention math + FSRS spaced-repetition scheduling.
+  memory      Ebbinghaus retention math + FSRS spaced-repetition scheduling +
+              the agent memory store.
   embeddings  SentenceTransformer vectorization (lazy, singleton).
   retrieval   Vector store (ChromaDB) adapter for semantic retrieval.
   ranking     Hybrid composite scoring + derived memory metrics.

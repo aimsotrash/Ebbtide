@@ -1,9 +1,10 @@
 name: CI
 
 # Runs on every push/PR to main:
-#   - backend + intelligence pytest          (tests)
+#   - backend, intelligence, MCP server and benchmark pytest (tests)
 #   - pip-audit                               (backend dependency security)
 #   - frontend tsc / lint / build             (build validation)
+#   - landing page (site/) lint / tsc / build  (build validation)
 #   - npm audit                               (frontend dependency security)
 on:
   push:
@@ -13,7 +14,7 @@ on:
 
 jobs:
   backend:
-    name: Backend + Intelligence tests & audit
+    name: Python tests & audit
     runs-on: ubuntu-latest
     env:
       DORY_ENV: dev
@@ -35,6 +36,12 @@ jobs:
 
       - name: Intelligence tests
         run: python -m pytest intelligence/tests/ -v
+
+      - name: MCP server tests
+        run: python -m pytest engram_mcp/tests/ -v
+
+      - name: Benchmark harness tests
+        run: python -m pytest bench/ -v
 
       # Dependency vulnerability scan. Non-blocking for now so a transitive
       # advisory surfaces without wedging CI; remove continue-on-error to gate.
@@ -74,3 +81,29 @@ jobs:
       - name: Dependency audit (npm)
         continue-on-error: true
         run: npm audit --audit-level=high
+
+  site:
+    name: Landing page lint / typecheck / build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install (lockfile-exact)
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Typecheck and build
+        run: npm run build

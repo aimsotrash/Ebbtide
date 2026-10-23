@@ -1,5 +1,7 @@
-"""Memory science: forgetting-curve retention + spaced-repetition scheduling."""
+"""Memory science: forgetting-curve retention, spaced-repetition scheduling, and
+long-term memory for AI agents."""
 
+from intelligence.memory.agent import POLICIES, Memory, MemoryStore, Policy
 from intelligence.memory.ebbinghaus import (
     FADING_THRESHOLD,
     STRONG_THRESHOLD,
@@ -23,4 +25,8 @@ __all__ = [
     "WEAK_THRESHOLD",
     "grade",
     "VALID_GRADES",
+    "Memory",
+    "MemoryStore",
+    "Policy",
+    "POLICIES",
 ]
