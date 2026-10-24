@@ -71,6 +71,10 @@ def test_spaced_strengthening_rewards_spacing_and_count_does_not():
     assert count_store.stats(month_later)["mean_retrievability"] == pytest.approx(0.08, abs=0.01)
 
 
+def test_count_rule_stability_grows_more_slowly_with_each_recall():
+    assert [round(stability(n), 3) for n in range(4)] == [1.0, 1.347, 1.549, 1.693]  # 1 + 0.5 ln(1 + n)
+
+
 @pytest.mark.parametrize("fusion", ["add", "mul"])
 def test_decay_ranking_prefers_the_stronger_of_equal_matches(fusion):
     def order(weight):

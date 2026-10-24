@@ -24,6 +24,7 @@ from engram_mcp.server import _config, _iso, _load
 from intelligence.memory import POLICIES, MemoryStore
 
 PAGE = Path(__file__).with_name("panel.html")
+FONT = Path(__file__).with_name("fonts") / "geist.woff2"  # the landing page's typeface, served locally
 
 
 def snapshot(now: float, ahead_days: float = 0.0) -> dict:
@@ -53,6 +54,8 @@ class _Handler(BaseHTTPRequestHandler):
         url = urlsplit(self.path)
         if url.path == "/":
             body, kind = PAGE.read_bytes(), "text/html; charset=utf-8"
+        elif url.path == "/geist.woff2":
+            body, kind = FONT.read_bytes(), "font/woff2"
         elif url.path == "/memories":
             try:
                 ahead = float(parse_qs(url.query).get("ahead", ["0"])[0])

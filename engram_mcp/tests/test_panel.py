@@ -36,6 +36,7 @@ def test_panel_lists_strengths_and_looks_ahead(tmp_path, monkeypatch):
 
         kind, page = get("/")
         assert kind.startswith("text/html") and b"Look ahead" in page
+        assert get("/geist.woff2")[0] == "font/woff2"
         today = json.loads(get("/memories")[1])
         week = json.loads(get("/memories?ahead=7")[1])
         with pytest.raises(urllib.error.HTTPError, match="400"):

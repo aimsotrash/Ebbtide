@@ -1,11 +1,9 @@
 name: CI
 
 # Runs on every push/PR to main:
-#   - backend, intelligence, MCP server and benchmark pytest (tests)
-#   - pip-audit                               (backend dependency security)
-#   - frontend tsc / lint / build             (build validation)
-#   - landing page (site/) lint / tsc / build  (build validation)
-#   - npm audit                               (frontend dependency security)
+#   - intelligence, MCP server and benchmark pytest  (tests)
+#   - pip-audit                                      (Python dependency security)
+#   - landing page (site/) lint / test / tsc / build (build validation)
 on:
   push:
     branches: [main]
@@ -13,26 +11,19 @@ on:
     branches: [main]
 
 jobs:
-  backend:
+  python:
     name: Python tests & audit
     runs-on: ubuntu-latest
-    env:
-      DORY_ENV: dev
-      DORY_SKIP_WARMUP: "1"
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
-          # 3.12 has wheels for the full ML stack; the test subset only needs a
-          # slice of it. The full requirements.txt is validated on 3.12 too.
+          # 3.12 has wheels for the full ML stack in engram_mcp/requirements.txt,
+          # which is validated on 3.12; the tests only need a slice of it.
           python-version: "3.12"
 
       - name: Install test dependencies
-        run: pip install -r backend/requirements-test.txt
-
-      - name: Backend tests
-        working-directory: backend
-        run: python -m pytest tests/ -v
+        run: pip install -r requirements-test.txt
 
       - name: Intelligence tests
         run: python -m pytest intelligence/tests/ -v
@@ -50,37 +41,6 @@ jobs:
         run: |
           pip install pip-audit
           pip-audit --strict --desc
-
-  frontend:
-    name: Frontend typecheck / lint / build & audit
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install (lockfile-exact)
-        run: npm ci
-
-      - name: Typecheck
-        run: npx tsc --noEmit
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Build
-        run: npx vite build
-
-      # Non-blocking dependency scan; flip to blocking once clean.
-      - name: Dependency audit (npm)
-        continue-on-error: true
-        run: npm audit --audit-level=high
 
   site:
     name: Landing page lint / typecheck / build

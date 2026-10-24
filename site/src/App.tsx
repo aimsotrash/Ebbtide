@@ -33,7 +33,7 @@ function HowItWorks() {
         <ol className="mt-14 space-y-[88px]">
           <li className="max-w-[560px]">
             <Rise><p className={lead}>First, tell your agent something worth keeping.</p></Rise>
-            <Rise delay={0.08}><pre className={cn(code, 'mt-4 bg-muted')}><code>&gt; Remember that I take my coffee black, no sugar.</code></pre></Rise>
+            <Rise delay={0.08}><p className={cn(code, 'mt-4 bg-muted')}>&gt; Remember that I take my coffee black, no sugar.</p></Rise>
             <Rise delay={0.16} className="mt-4 min-[700px]:ml-14">
               <pre data-ui className={cn(code, 'bg-[#f2f4f7] dark:bg-[#16181c]')}><code>{'engram.remember("Takes coffee black, no sugar",\n                tags=["preference"])\n{"id": 39, "evicted": []}'}</code></pre>
             </Rise>
@@ -57,7 +57,7 @@ function HowItWorks() {
           <li>
             <div className="max-w-[560px]">
               <Rise><p className={lead}>A new session asks, and the recall makes it last longer.</p></Rise>
-              <Rise delay={0.08}><pre className={cn(code, 'mt-4 bg-muted')}><code>&gt; How do I take my coffee?</code></pre></Rise>
+              <Rise delay={0.08}><p className={cn(code, 'mt-4 bg-muted')}>&gt; How do I take my coffee?</p></Rise>
             </div>
             <Rise delay={0.16} className="mt-4 min-[700px]:ml-14">
               <Terminal className="max-h-none w-full max-w-[760px] rounded-lg bg-field p-1 text-field-ink">

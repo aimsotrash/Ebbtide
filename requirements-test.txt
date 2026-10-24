@@ -1,0 +1,12 @@
+# Minimal, PINNED dependency set to run the intelligence, MCP server and benchmark
+# test suites.
+#
+# Excludes torch/sentence-transformers because the tests stub the embedder, so the
+# heavy ML stack is not needed for CI. These exact versions were verified to install
+# and pass the suites in a clean Python 3.12 venv; CI uses 3.12.
+#
+# Pins keep CI reproducible and let `pip-audit` evaluate a fixed surface.
+# To refresh: create a clean venv, install, run the suites, then `pip freeze`.
+pytest==9.0.3
+numpy==2.4.6
+mcp==2.3.0
