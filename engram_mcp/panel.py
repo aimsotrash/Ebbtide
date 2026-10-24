@@ -51,6 +51,12 @@ def snapshot(now: float, ahead_days: float = 0.0) -> dict:
 
 class _Handler(BaseHTTPRequestHandler):
     def do_GET(self):
+        # Only this machine's own names: a web page that rebinds its domain to 127.0.0.1
+        # (DNS rebinding) sends its own Host, and must not read the memories.
+        port = self.server.server_address[1]
+        if self.headers.get("Host") not in (f"127.0.0.1:{port}", f"localhost:{port}"):
+            self.send_error(403)
+            return
         url = urlsplit(self.path)
         if url.path == "/":
             body, kind = PAGE.read_bytes(), "text/html; charset=utf-8"

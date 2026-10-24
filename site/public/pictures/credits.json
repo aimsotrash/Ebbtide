@@ -1,6 +1,6 @@
 [
  {
-  "file": "site/public/pictures/uber-das-gedachtnis-untersuchungen-zur-experimentellen-psych.png",
+  "file": "site/public/pictures/ebbinghaus-fig2.png",
   "media": "image",
   "ref": "commons:134849117",
   "title": "Über das Gedächtnis. Untersuchungen zur experimentellen Psychologie, Fig 2",
@@ -22,29 +22,7 @@
   "saved": "2026-10-23T20:27:55.086Z"
  },
  {
-  "file": "site/public/pictures/uber-das-gedachtnis-untersuchungen-zur-experimentellen-psych-2.png",
-  "media": "image",
-  "ref": "commons:134849316",
-  "title": "Über das Gedächtnis. Untersuchungen zur experimentellen Psychologie, Fig 4",
-  "creator": "Hermann Ebbinghaus",
-  "creatorUrl": null,
-  "date": "1885-01-01",
-  "license": "public domain",
-  "licenseCode": "pd",
-  "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
-  "creditRequired": false,
-  "page": "https://commons.wikimedia.org/wiki/File:%C3%9Cber_das_Ged%C3%A4chtnis._Untersuchungen_zur_experimentellen_Psychologie,_Fig_4.png",
-  "via": "Wikimedia Commons",
-  "image": "https://upload.wikimedia.org/wikipedia/commons/e/ed/%C3%9Cber_das_Ged%C3%A4chtnis._Untersuchungen_zur_experimentellen_Psychologie%2C_Fig_4.png",
-  "width": 1392,
-  "height": 564,
-  "bytes": 161152,
-  "credit": "\"Über das Gedächtnis. Untersuchungen zur experimentellen Psychologie, Fig 4\" by Hermann Ebbinghaus, public domain, via Wikimedia Commons",
-  "notes": [],
-  "saved": "2026-10-23T20:27:55.457Z"
- },
- {
-  "file": "site/public/pictures/cajalhippocampus-modified.png",
+  "file": "site/public/pictures/cajal-hippocampus.png",
   "media": "image",
   "ref": "commons:3908039",
   "title": "CajalHippocampus (modified)",
@@ -66,7 +44,7 @@
   "saved": "2026-10-23T20:27:55.778Z"
  },
  {
-  "file": "site/public/pictures/santiago-ramon-y-cajal-dando-catedra-en.jpg",
+  "file": "site/public/pictures/cajal-laboratory.jpg",
   "media": "image",
   "ref": "commons:109736589",
   "title": "Santiago Ramón y Cajal dando cátedra en su laboratorio",

@@ -23,6 +23,7 @@ def test_tools_round_trip(tmp_path, monkeypatch):
     db = tmp_path / "memory.db"
     monkeypatch.setenv("ENGRAM_DB", str(db))
     monkeypatch.setenv("ENGRAM_BUDGET", "2")
+    monkeypatch.delenv("ENGRAM_POLICY", raising=False)
     monkeypatch.setattr(embeddings, "embed_query", _embed)
     monkeypatch.setattr(server, "time", SimpleNamespace(time=lambda: clock.now))
 
@@ -40,13 +41,14 @@ def test_tools_round_trip(tmp_path, monkeypatch):
         (0, "remember", {"text": "We deploy with Python 3.12"}),
         (3, "recall", {"query": "how do I take coffee", "k": 1}),
         (3, "remember", {"text": "   "}),
+        (3, "recall", {"query": "   "}),
     ]))
     assert [r.structured_content for r in first[:2]] == [{"id": 1, "evicted": []}, {"id": 2, "evicted": []}]
     assert first[2].structured_content == {"result": [{
         "id": 1, "text": "I take my coffee black", "tags": ["preference"],
         "strength": 0.717, "created": "1970-01-01T00:00+00:00",  # e^(-72 h / 216 h)
     }]}
-    assert first[3].is_error
+    assert first[3].is_error and first[4].is_error
 
     # A new session sees what the first one stored. The recalled coffee memory has
     # grown strong, so the budget pushes out the never-recalled deploy memory instead.

@@ -13,7 +13,7 @@ export function Install() {
   const commands = [
     `git clone https://github.com/aimsotrash/Engram ${where} && cd ${where}`,
     'python3.12 -m venv .venv && .venv/bin/pip install -r engram_mcp/requirements.txt',
-    `claude mcp add engram${scope === 'user' ? ' -s user' : ''} -e PYTHONPATH="$PWD" -- "$PWD/.venv/bin/python" -m engram_mcp`,
+    `claude mcp add engram${scope === 'user' ? ' -s user' : ''} -e PYTHONPATH="$PWD" -- "$PWD/.venv/bin/python" -P -m engram_mcp`,
   ].join('\n')
 
   const copy = async () => {

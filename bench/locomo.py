@@ -154,7 +154,7 @@ And all of a conversation's questions come after its last turn and only look at 
 their order doesn't matter. Each decay policy keeps the settings LongMemEval's dev split picked.
 
 **Intervals.** Questions about one conversation share its replay, so the 95% intervals resample
-whole conversations. With 10 conversations they are wide.
+whole conversations. With 10 conversations they are wide, and likely still somewhat too narrow.
 
 ## {PRIMARY} by budget
 
@@ -172,7 +172,7 @@ keep-all ignores the budget, so its row repeats.
 
 ## Both Engram variants against LRU
 
-Named before this run. Each cell is the variant minus LRU, in points, with a 95% interval:
+Chosen after the LongMemEval results and before this run. Each cell is the variant minus LRU, in points, with a 95% interval:
 
 {versus}
 """
