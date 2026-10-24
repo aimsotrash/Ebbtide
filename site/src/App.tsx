@@ -118,7 +118,7 @@ function Tools() {
     run()
     const resized = new ResizeObserver(run)
     const changed = new MutationObserver(run)  // rows re-sort as the look-ahead moves
-    resized.observe(root)
+    for (const el of [root, headingRef.current, ...Object.values(noteRefs.current)]) if (el) resized.observe(el)
     changed.observe(root, { childList: true, subtree: true })
     return () => { resized.disconnect(); changed.disconnect() }
   }, [])

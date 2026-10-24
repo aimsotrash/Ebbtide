@@ -35,7 +35,7 @@ export function Hero() {
       <Slider id="hero-days" className="mt-3 [&_[data-slot=slider-range]]:bg-field-ink [&_[data-slot=slider-thumb]]:border-field-ink [&_[data-slot=slider-track]]:bg-[#3a3a3a]"
               aria-labelledby="hero-days-label" aria-valuetext={`${daysSince} days, strength ${pct(r)}`}
               min={0} max={60} step={1} value={[daysSince]} onValueChange={([v]) => setDaysSince(v)} />
-      <p className="mt-2 tabular-nums text-field-muted" aria-live="polite">strength {pct(r)}</p>
+      <p className="mt-2 tabular-nums text-field-muted">strength {pct(r)}</p>
     </div>
   )
   const recallChip = (
@@ -60,7 +60,7 @@ export function Hero() {
   )
 
   return (
-    <header className="relative flex min-h-svh flex-col bg-field px-[var(--margin)] text-field-ink [--ring:#8aa4ff]">
+    <header id="top" className="relative flex min-h-svh flex-col bg-field px-[var(--margin)] text-field-ink [--ring:#8aa4ff]">
       <nav className="mx-auto flex w-full max-w-[1280px] items-center justify-between pt-7" aria-label="Main">
         <a href="#top" className="text-[14px] font-semibold">Engram</a>
         <div className="flex items-center gap-6 text-[14px]">
@@ -73,7 +73,7 @@ export function Hero() {
         </div>
       </nav>
 
-      <div id="top" className="flex flex-1 flex-col items-center justify-center pb-[12svh] pt-16">
+      <div className="flex flex-1 flex-col items-center justify-center pb-[12svh] pt-16">
         <div className="relative w-full max-w-[1280px]">
           <div className="mb-6 flex justify-center min-[1100px]:absolute min-[1100px]:-top-28 min-[1100px]:left-[19%] min-[1100px]:mb-0">
             {daysChip}

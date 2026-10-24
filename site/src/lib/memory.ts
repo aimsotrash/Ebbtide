@@ -13,12 +13,15 @@ export type Rule = 'count' | 'spaced'
 export const strength = (daysSince: number, stability: number) =>
   Math.exp((-daysSince * 24) / (stability * SCALE_HOURS))
 
+/** The count rule's stability after `recalls` recalls, as ebbinghaus.stability computes it. */
+export const stability = (recalls: number) => 1 + 0.5 * Math.log1p(recalls)
+
 export const halfLifeDays = (stability: number) => (Math.LN2 * stability * SCALE_HOURS) / 24
 
 /** Stability after one more recall, made when the memory's strength was `r`. */
-export function strengthen(rule: Rule, stability: number, recalls: number, r: number) {
-  if (rule === 'count') return 1 + 0.5 * Math.log1p(recalls + 1)
-  return stability * (1 + SPACED_GAIN * stability ** -W9 * Math.expm1(W10 * (1 - r)))
+export function strengthen(rule: Rule, s: number, recalls: number, r: number) {
+  if (rule === 'count') return stability(recalls + 1)
+  return s * (1 + SPACED_GAIN * s ** -W9 * Math.expm1(W10 * (1 - r)))
 }
 
 export const pct = (r: number) => `${Math.round(100 * r)}%`

@@ -17,17 +17,17 @@ package adds the tools and SQLite persistence.
 
 ## Setup
 
-From the repo root, with Python 3.12:
+From the repo root, with Python 3.12, on Linux or an Apple silicon Mac (macOS 14 or later):
 
 ```bash
 python3.12 -m venv .venv          # no python3.12? uv venv -p 3.12 .venv
 .venv/bin/pip install -r engram_mcp/requirements.txt
-claude mcp add engram -e PYTHONPATH="$PWD" -- "$PWD/.venv/bin/python" -P -m engram_mcp
+claude mcp add engram -s user -e PYTHONPATH="$PWD" -- "$PWD/.venv/bin/python" -P -m engram_mcp
 ```
 
 `PYTHONPATH` lets the server import `intelligence/` from wherever Claude Code starts it, and
-`-P` stops Python from importing anything from that folder. `claude mcp add` registers the
-server for the current project only; to use it in every project, add `-s user` before the `--`.
+`-P` stops Python from importing anything from that folder. `-s user` makes Engram available
+in every project; without it, Claude Code would use it only inside this folder.
 
 The first `remember` or `recall` in a session takes about 5 seconds while the embedding
 model (`all-MiniLM-L6-v2`) loads, and the very first run also downloads it (~90 MB).
