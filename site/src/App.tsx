@@ -186,8 +186,8 @@ function Results() {
       </div>
       <p className="mx-auto mt-8 max-w-[1280px] text-[17px] leading-snug text-muted-foreground">
         engram-count's lead over LRU on LongMemEval was found after the results came in; on LoCoMo, where the comparison
-        was named first, it held with smaller gains. Read <a className="text-primary underline" href={`${REPO}/blob/agent-memory/bench/RESULTS.md`}>every LongMemEval result</a>{' '}
-        and <a className="text-primary underline" href={`${REPO}/blob/agent-memory/bench/RESULTS-locomo.md`}>every LoCoMo result</a>, with the losses.
+        was named first, it held with smaller gains. Read <a className="text-primary underline" href={`${REPO}/blob/main/bench/RESULTS.md`}>every LongMemEval result</a>{' '}
+        and <a className="text-primary underline" href={`${REPO}/blob/main/bench/RESULTS-locomo.md`}>every LoCoMo result</a>, with the losses.
       </p>
     </section>
   )
@@ -234,9 +234,8 @@ function Origin() {
             <div aria-hidden="true" className="flex size-11 items-center justify-center rounded-full bg-foreground text-[14px] font-semibold text-background">NP</div>
             <div className="mt-7 space-y-5 text-[17px] leading-[1.55]">
               <p>
-                Engram began as Dory.md, a notes app that Vaishnavi Chaughule, Shraddha Deshpande and I built in 48 hours at
-                UWB Hacks in April 2026. It gave every note a strength that decayed along Ebbinghaus's forgetting curve, so
-                search could put first what you were about to forget.
+                Engram began as a notes app. It gave every note a strength that decayed along Ebbinghaus's forgetting
+                curve, so search could put first what you were about to forget.
               </p>
               <p>
                 In October I pointed the same engine at AI agents. An agent that runs for weeks collects more memories than it

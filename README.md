@@ -4,14 +4,8 @@
 
 **Long-term memory for AI agents that forgets on purpose.**
 
-Engram started as **Dory.md**, a notes app built in 48 hours at **UWB Hacks 2026** (MLH)
-by a team of three. This repository continues the project from my last commit to the team
-repository on June 7, 2026. The team repository,
-[vaishnavi1064/Dory.md](https://github.com/vaishnavi1064/Dory.md), has since gone its
-own way. The memory for AI agents, from October 2026, is my own work.
-
-I retired the notes app in October 2026. Its last version is the git tag
-[`notes-app`](https://github.com/aimsotrash/Engram/tree/notes-app).
+Engram began as a notes app. I retired the notes app in October 2026; its last version is
+the git tag [`notes-app`](https://github.com/aimsotrash/Engram/tree/notes-app).
 
 **Live:** [aimsotrash-engram.vercel.app](https://aimsotrash-engram.vercel.app)
 
@@ -54,53 +48,6 @@ nothing was tuned on it.
 
 MemoryBank (Zhong et al., 2023) already applied an Ebbinghaus curve to LLM memory. What is
 new here is the measured comparison with simple baselines, losses included.
-
-## Who built what
-
-Share of the code, counted with `git blame -w -M -C -C` over the code files (Python,
-TypeScript and JavaScript, CSS, HTML, SQL, shell and config files). Moved and copied lines keep their original
-author, and `.mailmap` merges each person's commit identities, so anyone can
-reproduce these numbers from this repository's history.
-
-| Snapshot | Lines of code | Nikhil Pawar | Vaishnavi Chaughule | Shraddha Deshpande |
-| --- | ---: | ---: | ---: | ---: |
-| End of the hackathon, Apr 26, 2026 (`f6f9657`) | 14,371 | 62.5% | 22.5% | 15.0% |
-| My last commit to the team repo, Jun 7, 2026 (`18d440e`, on the `Fix-login` branch) | 10,722 | 91.7% | 2.4% | 5.8% |
-
-At the hackathon I wrote the FastAPI backend and most of the React app, building on
-Shraddha's first version of the frontend. Vaishnavi wrote a separate intelligence
-package. In May and June I rebuilt `intelligence/` around the backend's own
-forgetting-curve engine, the curve the memory for AI agents is built on.
-
-## My part
-
-- the notes app's FastAPI service and the API contract its React frontend called
-- multi-format ingestion, sentence-transformer embeddings, and SQLite + ChromaDB
-  persistence
-- the NumPy-vectorized forgetting-curve engine, 50–100x faster than per-chunk loops,
-  which drove decay-aware search
-- FSRS review scheduling and the retention-aware ranking
-- bcrypt + JWT authentication with per-user data isolation, and the Notion OAuth
-  import
-- the June 2026 security pass: no hardcoded JWT secret, the demo account limited to
-  dev, an explicit CORS allow-list, pinned dependencies, CI with dependency scans, a
-  backup utility for both stores, and a P0 security test suite
-- deployment: the Vercel frontend, and the backend on Railway, where switching to
-  CPU-only PyTorch cut the image from 5.8 GB to about 1.5 GB
-- frontend features: login and registration, the note editor, the knowledge-tree
-  dashboard and the theme switcher
-- memory for AI agents (October 2026): the forgetting-curve memory store and its six
-  policies, the MCP server and its panel, and the LongMemEval and LoCoMo benchmark
-  harnesses
-
-## The hackathon team
-
-- [Nikhil Pawar](https://github.com/aimsotrash): backend, the forgetting-curve
-  engine, most of the frontend
-- [Shraddha Deshpande](https://github.com/deshpandesk8): the first version of the
-  React frontend
-- [Vaishnavi Chaughule](https://github.com/vaishnavi1064): the hackathon
-  intelligence package
 
 ## Stack
 
@@ -147,5 +94,4 @@ python -m pytest intelligence/tests engram_mcp/tests bench
 
 ## License
 
-[MIT](LICENSE). The code from the hackathon stays under the team's original notice,
-"Dory.md contributors".
+[MIT](LICENSE).
