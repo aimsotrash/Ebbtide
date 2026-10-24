@@ -13,6 +13,10 @@ env/
 # Environment
 .env
 
+# Memory databases (ENGRAM_DB)
+*.db
+*.db-*
+
 # IDE
 .vscode/
 .idea/

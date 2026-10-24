@@ -17,17 +17,17 @@ package adds the tools and SQLite persistence.
 
 ## Setup
 
-From the repo root, with Python 3.12:
+From the repo root, with Python 3.12, on Linux or an Apple silicon Mac (macOS 14 or later):
 
 ```bash
-python3.12 -m venv .venv
+python3.12 -m venv .venv          # no python3.12? uv venv -p 3.12 .venv
 .venv/bin/pip install -r engram_mcp/requirements.txt
-claude mcp add engram -e PYTHONPATH="$PWD" -- "$PWD/.venv/bin/python" -m engram_mcp
+claude mcp add engram -s user -e PYTHONPATH="$PWD" -- "$PWD/.venv/bin/python" -P -m engram_mcp
 ```
 
-`PYTHONPATH` lets the server import `intelligence/` from wherever Claude Code starts it.
-`claude mcp add` registers the server for the current project only; add `-s user` to
-use it in every project.
+`PYTHONPATH` lets the server import `intelligence/` from wherever Claude Code starts it, and
+`-P` stops Python from importing anything from that folder. `-s user` makes Engram available
+in every project; without it, Claude Code would use it only inside this folder.
 
 The first `remember` or `recall` in a session takes about 5 seconds while the embedding
 model (`all-MiniLM-L6-v2`) loads, and the very first run also downloads it (~90 MB).
@@ -47,27 +47,28 @@ ones fade more slowly. It listens on 127.0.0.1 only and loads nothing from the i
 
 For a demo that shouldn't touch your real memories, point both at a scratch database: set
 `ENGRAM_DB=/tmp/engram-demo.db` for the panel, and pass `-e ENGRAM_DB=/tmp/engram-demo.db`
-when you register the server. Once a first run has downloaded the embedding model, passing
-`-e HF_HUB_OFFLINE=1` as well keeps the server off the network entirely, which helps on
-unreliable venue Wi-Fi.
+when you register the server. Once a first run has downloaded the embedding model, the server
+loads it from disk and never goes online, so venue Wi-Fi doesn't matter.
 
 ## Configuration
 
 | Variable | Default | Purpose |
 |---|---|---|
 | `ENGRAM_DB` | `~/.local/share/engram/memory.db` | SQLite file holding the memories and their embeddings. |
-| `ENGRAM_POLICY` | `engram-count` | A policy name from `intelligence.memory.POLICIES`. The default won on the benchmark's dev split; see [`bench/RESULTS.md`](../bench/RESULTS.md). |
+| `ENGRAM_POLICY` | `engram-count` | A policy name from `intelligence.memory.POLICIES`. Of the forgetting-curve policies, the default scored best on the benchmark's dev split at the 25% and 50% budgets; see [`bench/RESULTS.md`](../bench/RESULTS.md). |
 | `ENGRAM_BUDGET` | `1000` | The most memories kept. `keep-all` ignores it. |
 
-Pass them with `-e` when you register the server. Each tool call is one SQLite
+Pass them with `-e` when you register the server, and give the panel the same values, since it
+reads them from its own environment. Each tool call is one SQLite
 transaction, so two agents can share one database safely.
 
 ## Test
 
 ```bash
-python -m pytest engram_mcp/tests/
+.venv/bin/pip install -r requirements-test.txt   # adds pytest
+.venv/bin/python -m pytest engram_mcp/tests/
 ```
 
 They call every tool through an in-process MCP client and fetch the panel through its
-HTTP handler, with a stub embedder and a fake clock, so they need only the repo root's
-[`requirements-test.txt`](../requirements-test.txt), not the embedding model.
+HTTP handler, with a stub embedder and a fake clock, so they never load the embedding model;
+a venv with only [`requirements-test.txt`](../requirements-test.txt) runs them too.

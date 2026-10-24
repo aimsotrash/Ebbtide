@@ -7,14 +7,18 @@ tests stub the embedder, so they never load it.
 """
 
 _model = None  # type: ignore[var-annotated]
-MODEL_NAME = "all-MiniLM-L6-v2"
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+REVISION = "1110a243fdf4706b3f48f1d95db1a4f5529b4d41"  # pinned: a changed upstream repo is never loaded
 
 
 def warm_model() -> None:
     global _model
     if _model is None:
         from sentence_transformers import SentenceTransformer  # heavy import: defer
-        _model = SentenceTransformer(MODEL_NAME)
+        try:  # the cache first: offline, the Hugging Face client retries for minutes before using it
+            _model = SentenceTransformer(MODEL_NAME, revision=REVISION, local_files_only=True)
+        except OSError:  # not downloaded yet
+            _model = SentenceTransformer(MODEL_NAME, revision=REVISION)
 
 
 def get_model():

@@ -70,9 +70,6 @@
   --blue: #1a4be0;
   --blue-ink: #ffffff;
 
-  --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
-  --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
-  --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
   --step-head: clamp(2.25rem, 1.5rem + 2.4vw, 3.5rem);
   --margin: clamp(1.25rem, 3vw, 2rem);
 }

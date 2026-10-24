@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
-import { days, halfLifeDays, pct, strength } from '@/lib/memory'
+import { days, halfLifeDays, pct, stability, strength } from '@/lib/memory'
 
 // A coding agent's memories about this project, as the panel shows them. Stability follows the
 // count rule (S = 1 + 0.5 ln(1 + recalls)); strength is computed from it, never typed in.
@@ -27,9 +27,9 @@ export function Panel({ focus }: { focus?: Part | null }) {
   const rows = useMemo(
     () =>
       MEMORIES.map((m) => {
-        const stability = 1 + 0.5 * Math.log1p(m.recalls)
-        const r = strength((m.last ?? m.added) + ahead, stability)
-        return { ...m, r, halfLife: halfLifeDays(stability) }
+        const s = stability(m.recalls)
+        const r = strength((m.last ?? m.added) + ahead, s)
+        return { ...m, r, halfLife: halfLifeDays(s) }
       }).sort((a, b) => b.r - a.r),
     [ahead],
   )

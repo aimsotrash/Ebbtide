@@ -118,7 +118,7 @@ function Tools() {
     run()
     const resized = new ResizeObserver(run)
     const changed = new MutationObserver(run)  // rows re-sort as the look-ahead moves
-    resized.observe(root)
+    for (const el of [root, headingRef.current, ...Object.values(noteRefs.current)]) if (el) resized.observe(el)
     changed.observe(root, { childList: true, subtree: true })
     return () => { resized.disconnect(); changed.disconnect() }
   }, [])
@@ -157,11 +157,11 @@ function Tools() {
 }
 
 const RESULTS: { value: number; sign?: string; unit?: string; text: string }[] = [
-  { value: 58.5, unit: '%', text: 'of LongMemEval questions have all their evidence found when nothing is forgotten.' },
+  { value: 58.5, unit: '%', text: 'of LongMemEval questions have all their evidence in the top 10 results when nothing is forgotten.' },
   { value: 36.8, unit: '%', text: 'is the best any forgetting rule reaches on LongMemEval with room for half the history.' },
   { value: 3.9, sign: '+', text: 'points more of the evidence kept than LRU, by strengthening on recall, at half the history.' },
-  { value: 14.0, sign: '+', text: 'points more questions whose evidence sessions are found than with LRU, at a quarter of the history.' },
-  { value: 17.2, sign: '−', text: 'points: when a fact changes, FSRS-style spacing finds the newest version less often than LRU.' },
+  { value: 14.0, sign: '+', text: 'points more questions with every answer session in the top 10 than with LRU, by strengthening on recall, at a quarter of the history.' },
+  { value: 17.2, sign: '−', text: 'points on LongMemEval at a quarter or half of the history: when a fact changes, FSRS-style spacing finds the newest version less often than LRU.' },
   { value: 26.8, unit: '%', text: "is LoCoMo's best at half the history, from keeping the newest. Engram does not beat it there." },
 ]
 
@@ -172,7 +172,7 @@ function Results() {
         <Rise className="flex min-h-[160px] flex-col justify-between bg-blue p-6 text-blue-ink min-[640px]:col-span-2 min-[900px]:min-h-[232px]">
           <h2 id="results-title" className={head}>Measured, losses included</h2>
           <p className="mt-6 max-w-[46ch] text-[17px] leading-snug">
-            Two public benchmarks. Settings were picked on a fixed dev split, and each test set was scored once.
+            Two public benchmarks. Settings were picked on a fixed dev split before any test question was scored.
           </p>
         </Rise>
         {RESULTS.map((r, i) => (
@@ -185,9 +185,9 @@ function Results() {
         ))}
       </div>
       <p className="mx-auto mt-8 max-w-[1280px] text-[17px] leading-snug text-muted-foreground">
-        engram-count's lead over LRU on LongMemEval was found after the results came in; on LoCoMo, where the comparison
-        was named first, it held with smaller gains. Read <a className="text-primary underline" href={`${REPO}/blob/agent-memory/bench/RESULTS.md`}>every LongMemEval result</a>{' '}
-        and <a className="text-primary underline" href={`${REPO}/blob/agent-memory/bench/RESULTS-locomo.md`}>every LoCoMo result</a>, with the losses.
+        The comparisons with LRU were chosen after the LongMemEval results came in; on LoCoMo, where the main one was
+        chosen before the run, it held with smaller gains. Read <a className="text-primary underline" href={`${REPO}/blob/main/bench/RESULTS.md`}>every LongMemEval result</a>{' '}
+        and <a className="text-primary underline" href={`${REPO}/blob/main/bench/RESULTS-locomo.md`}>every LoCoMo result</a>, with the losses.
       </p>
     </section>
   )
@@ -234,9 +234,8 @@ function Origin() {
             <div aria-hidden="true" className="flex size-11 items-center justify-center rounded-full bg-foreground text-[14px] font-semibold text-background">NP</div>
             <div className="mt-7 space-y-5 text-[17px] leading-[1.55]">
               <p>
-                Engram began as Dory.md, a notes app that Vaishnavi Chaughule, Shraddha Deshpande and I built in 48 hours at
-                UWB Hacks in April 2026. It gave every note a strength that decayed along Ebbinghaus's forgetting curve, so
-                search could put first what you were about to forget.
+                Engram began as a notes app. It gave every note a strength that decayed along Ebbinghaus's forgetting
+                curve, so search could put first what you were about to forget.
               </p>
               <p>
                 In October I pointed the same engine at AI agents. An agent that runs for weeks collects more memories than it
