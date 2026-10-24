@@ -80,8 +80,8 @@ export function Hero() {
           </div>
           <h1 className="text-center text-[11.5vw] leading-[1.0] min-[1100px]:text-[clamp(96px,9vw,150px)]"
               style={{ fontWeight: Math.round(200 + 500 * r), opacity: 0.42 + 0.58 * r, transition: 'font-weight 250ms, opacity 250ms' }}>
-            <span className="block overflow-hidden pb-[0.06em]"><span className="rise">Agent memory</span></span>
-            <span className="block overflow-hidden pb-[0.06em]"><span className="rise [animation-delay:110ms]">that fades</span></span>
+            <span className="block overflow-hidden pb-[0.25em] -mb-[0.19em]"><span className="rise">Agent memory</span></span>
+            <span className="block overflow-hidden pb-[0.25em] -mb-[0.19em]"><span className="rise [animation-delay:110ms]">that fades</span></span>
           </h1>
           <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center min-[1100px]:mt-0 min-[1100px]:contents">
             <div className="min-[1100px]:absolute min-[1100px]:bottom-[6%] min-[1100px]:left-[1%]">{recallChip}</div>

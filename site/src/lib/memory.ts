@@ -1,7 +1,7 @@
 // The forgetting curve the page demonstrates, copied from intelligence/memory/agent.py so the
 // numbers here are the real store's: R = e^(-t / (S * 216 h)), S starts at 1.
 
-export const SCALE_HOURS = 216 // the notes engine's 9-day base
+export const SCALE_HOURS = 216 // 9 days: how long a new memory takes to fall to 1/e
 
 // FSRS-6 default weights, as the "spaced" rule uses them (see agent.py).
 const W4 = 6.4133, W5 = 0.8334, W8 = 1.8722, W9 = 0.1666, W10 = 0.796
