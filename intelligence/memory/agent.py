@@ -4,7 +4,7 @@ Long-term memory for AI agents, on the forgetting curve.
 Each memory fades as  R = e^( -t / (S * scale) )
   t      = time since it was last recalled, or since it was added
   S      = stability: starts at 1 and grows on recall if the policy strengthens
-  scale  = decay time scale, 216 h by default (the notes engine's 9-day base)
+  scale  = decay time scale, 216 h by default (the 9-day base the notes app used)
 
 recall() ranks memories by similarity combined with R, then refreshes each one it
 returns: t starts over, and S may grow. When an add would go over the budget, the
@@ -45,8 +45,8 @@ class Policy:
                  (lowest R), or None to never evict (keep-all ignores the budget)
     weight       how much R counts in ranking; 0 ranks by similarity alone
     fusion       "add": sim + weight * log R, or "mul": sim * R ** weight
-    strengthen   None, "count" (S grows with the recall count, as in the notes
-                 engine) or "spaced" (FSRS-6: the lower R was, the more S grows)
+    strengthen   None, "count" (S grows with the recall count, as it did in the
+                 notes app) or "spaced" (FSRS-6: the lower R was, the more S grows)
     scale_hours  decay time scale
     """
 

@@ -69,5 +69,5 @@ python -m pytest engram_mcp/tests/
 ```
 
 They call every tool through an in-process MCP client and fetch the panel through its
-HTTP handler, with a stub embedder and a fake clock, so they need only
-`backend/requirements-test.txt`, not the embedding model.
+HTTP handler, with a stub embedder and a fake clock, so they need only the repo root's
+[`requirements-test.txt`](../requirements-test.txt), not the embedding model.

@@ -2,13 +2,16 @@
 
 [![CI](https://github.com/aimsotrash/Engram/actions/workflows/ci.yml/badge.svg)](https://github.com/aimsotrash/Engram/actions/workflows/ci.yml)
 
-**Long-term memory for AI agents that forgets on purpose, and the notes app it grew out of.**
+**Long-term memory for AI agents that forgets on purpose.**
 
-Engram started as **Dory.md**, built in 48 hours at **UWB Hacks 2026** (MLH) by a
-team of three. This repository continues the project from my last commit to the team
+Engram started as **Dory.md**, a notes app built in 48 hours at **UWB Hacks 2026** (MLH)
+by a team of three. This repository continues the project from my last commit to the team
 repository on June 7, 2026. The team repository,
 [vaishnavi1064/Dory.md](https://github.com/vaishnavi1064/Dory.md), has since gone its
 own way. The memory for AI agents, from October 2026, is my own work.
+
+I retired the notes app in October 2026. Its last version is the git tag
+[`notes-app`](https://github.com/aimsotrash/Engram/tree/notes-app).
 
 **Live:** [aimsotrash-engram.vercel.app](https://aimsotrash-engram.vercel.app)
 
@@ -52,22 +55,6 @@ nothing was tuned on it.
 MemoryBank (Zhong et al., 2023) already applied an Ebbinghaus curve to LLM memory. What is
 new here is the measured comparison with simple baselines, losses included.
 
-## The notes app
-
-Engram splits your notes into chunks and gives each chunk a retention score that
-decays along an Ebbinghaus forgetting curve. That score is a ranking signal, not just
-a number on a dashboard. Search puts what you're forgetting first, reviews are
-scheduled with FSRS, and quizzes are built from your weakest material.
-
-- **Decay-aware semantic search.** Sentence-transformer embeddings in ChromaDB,
-  re-ranked by how close each match is to being forgotten.
-- **Ingestion from many formats.** PDF, Word, HTML, Markdown and plain-text files,
-  plus Notion pages through OAuth.
-- **Spaced repetition and quizzes.** FSRS review scheduling and LLM-generated
-  quizzes, with fallbacks when no model key is configured.
-- **Knowledge-tree dashboard.** An interactive map of your notes and how well you
-  remember them.
-
 ## Who built what
 
 Share of the code, counted with `git blame -w -M -C -C` over the code files (Python,
@@ -83,24 +70,23 @@ reproduce these numbers from this repository's history.
 At the hackathon I wrote the FastAPI backend and most of the React app, building on
 Shraddha's first version of the frontend. Vaishnavi wrote a separate intelligence
 package. In May and June I rebuilt `intelligence/` around the backend's own
-forgetting-curve engine, and that is the version in this repository.
+forgetting-curve engine, the curve the memory for AI agents is built on.
 
 ## My part
 
-- the FastAPI service and the API contract the React frontend calls
+- the notes app's FastAPI service and the API contract its React frontend called
 - multi-format ingestion, sentence-transformer embeddings, and SQLite + ChromaDB
   persistence
 - the NumPy-vectorized forgetting-curve engine, 50–100x faster than per-chunk loops,
-  which drives decay-aware search
+  which drove decay-aware search
 - FSRS review scheduling and the retention-aware ranking
 - bcrypt + JWT authentication with per-user data isolation, and the Notion OAuth
   import
 - the June 2026 security pass: no hardcoded JWT secret, the demo account limited to
   dev, an explicit CORS allow-list, pinned dependencies, CI with dependency scans, a
   backup utility for both stores, and a P0 security test suite
-- deployment: the Vercel frontend, and the backend, first on Railway (where switching
-  to CPU-only PyTorch cut the image from 5.8 GB to about 1.5 GB) and now on Hugging
-  Face Spaces
+- deployment: the Vercel frontend, and the backend on Railway, where switching to
+  CPU-only PyTorch cut the image from 5.8 GB to about 1.5 GB
 - frontend features: login and registration, the note editor, the knowledge-tree
   dashboard and the theme switcher
 - memory for AI agents (October 2026): the forgetting-curve memory store and its six
@@ -118,27 +104,14 @@ forgetting-curve engine, and that is the version in this repository.
 
 ## Stack
 
-FastAPI · Python · MCP · sentence-transformers · ChromaDB · SQLite · FSRS · React ·
-TypeScript · Vite · Tailwind CSS · Framer Motion
+Python · MCP · sentence-transformers · NumPy · SQLite · React · TypeScript · Vite ·
+Tailwind CSS · Motion
 
 ## Run it locally
 
-```bash
-# backend
-cd backend
-python -m venv .venv && .venv/bin/pip install -r requirements.txt
-cp .env.example .env            # optional: add an LLM key for quizzes and AI actions
-.venv/bin/uvicorn main:app --port 8001
+To run the MCP server, follow the setup in [`engram_mcp/README.md`](engram_mcp/README.md).
 
-# frontend, in a second terminal
-cd frontend
-npm install
-cp .env.example .env.local      # VITE_API_BASE_URL=http://localhost:8001
-npm run dev
-```
-
-The MCP server has its own setup in [`engram_mcp/README.md`](engram_mcp/README.md). To
-reproduce the benchmarks, after installing `engram_mcp/requirements.txt`:
+To reproduce the benchmarks, after installing `engram_mcp/requirements.txt`:
 
 ```bash
 python -m bench.longmemeval embed   # downloads the data and embeds it once, ~45 min on a laptop CPU
@@ -152,19 +125,12 @@ The landing page for the MCP server lives in `site/` (Vite, React and Tailwind):
 cd site && npm install && npm run dev   # http://localhost:5173
 ```
 
-The app's environment variables keep the project's original `DORY_` prefix; those of
-the agent-memory MCP server ([`engram_mcp/`](engram_mcp/README.md)) use `ENGRAM_`. They
-are all listed in [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md), including the ones
-production needs.
-
-Tests (79: 51 backend, 22 intelligence, 2 MCP server, 4 benchmark) need only the light
+The Python tests (18: 12 intelligence, 2 MCP server, 4 benchmark) need only the light
 dependency set:
 
 ```bash
-pip install -r backend/requirements-test.txt
-(cd backend && DORY_ENV=dev DORY_SKIP_WARMUP=1 python -m pytest tests/)
-DORY_ENV=dev DORY_SKIP_WARMUP=1 python -m pytest intelligence/tests/
-python -m pytest engram_mcp/tests/ bench/
+pip install -r requirements-test.txt
+python -m pytest intelligence/tests engram_mcp/tests bench
 ```
 
 ## References
