@@ -7,7 +7,7 @@ import { NumberTicker } from '@/components/ui/number-ticker'
 import { AnimatedSpan, Terminal, TypingAnimation } from '@/components/ui/terminal'
 import { cn } from '@/lib/utils'
 
-const REPO = 'https://github.com/aimsotrash/Engram'
+const REPO = 'https://github.com/aimsotrash/Ebbtide'
 // The page's type steps: 13 small, 17 body, 22 lead, `head` for section headings, and the hero's display size.
 const head = 'text-[length:var(--step-head)]'
 const lead = 'text-[22px] font-medium leading-snug'
@@ -35,7 +35,7 @@ function HowItWorks() {
             <Rise><p className={lead}>First, tell your agent something worth keeping.</p></Rise>
             <Rise delay={0.08}><p className={cn(code, 'mt-4 bg-muted')}>&gt; Remember that I take my coffee black, no sugar.</p></Rise>
             <Rise delay={0.16} className="mt-4 min-[700px]:ml-14">
-              <pre data-ui className={cn(code, 'bg-[#f2f4f7] dark:bg-[#16181c]')}><code>{'engram.remember("Takes coffee black, no sugar",\n                tags=["preference"])\n{"id": 39, "evicted": []}'}</code></pre>
+              <pre data-ui className={cn(code, 'bg-[#f2f4f7] dark:bg-[#16181c]')}><code>{'ebbtide.remember("Takes coffee black, no sugar",\n                tags=["preference"])\n{"id": 39, "evicted": []}'}</code></pre>
             </Rise>
           </li>
           <li className="max-w-[560px]">
@@ -61,7 +61,7 @@ function HowItWorks() {
             </div>
             <Rise delay={0.16} className="mt-4 min-[700px]:ml-14">
               <Terminal className="max-h-none w-full max-w-[760px] rounded-lg bg-field p-1 text-field-ink">
-                <TypingAnimation duration={22} className="text-[14px] text-field-muted">{'engram.recall("how do I take my coffee", k=5)'}</TypingAnimation>
+                <TypingAnimation duration={22} className="text-[14px] text-field-muted">{'ebbtide.recall("how do I take my coffee", k=5)'}</TypingAnimation>
                 <AnimatedSpan className="text-[14px]">39  Takes coffee black, no sugar   strength 0.37   recalled 0×</AnimatedSpan>
                 <AnimatedSpan className="text-[14px] text-field-muted">memory 39 is back to 100%; its half-life grows from 6.2 to 8.4 days</AnimatedSpan>
                 <TypingAnimation duration={40} className="text-[14px]">Black, no sugar.</TypingAnimation>
@@ -150,7 +150,7 @@ function Tools() {
         </div>
       </div>
       <p className="mx-auto mt-12 max-w-[1280px] text-center text-[17px] text-muted-foreground">
-        The panel runs on your machine with <code className="text-foreground">python -m engram_mcp.panel</code> and never goes online.
+        The panel runs on your machine with <code className="text-foreground">ebbtide-panel</code> and never goes online.
       </p>
     </section>
   )
@@ -162,7 +162,7 @@ const RESULTS: { value: number; sign?: string; unit?: string; text: string }[] =
   { value: 3.9, sign: '+', text: 'points more of the evidence kept than LRU, by strengthening on recall, at half the history.' },
   { value: 14.0, sign: '+', text: 'points more questions with every answer session in the top 10 than with LRU, by strengthening on recall, at a quarter of the history.' },
   { value: 17.2, sign: '−', text: 'points on LongMemEval at a quarter or half of the history: when a fact changes, FSRS-style spacing finds the newest version less often than LRU.' },
-  { value: 26.8, unit: '%', text: "is LoCoMo's best at half the history, from keeping the newest. Engram does not beat it there." },
+  { value: 26.8, unit: '%', text: "is LoCoMo's best at half the history, from keeping the newest. Ebbtide does not beat it there." },
 ]
 
 function Results() {
@@ -234,12 +234,12 @@ function Origin() {
             <div aria-hidden="true" className="flex size-11 items-center justify-center rounded-full bg-foreground text-[14px] font-semibold text-background">NP</div>
             <div className="mt-7 space-y-5 text-[17px] leading-[1.55]">
               <p>
-                Engram began as a notes app. It gave every note a strength that decayed along Ebbinghaus's forgetting
+                Ebbtide began as a notes app. It gave every note a strength that decayed along Ebbinghaus's forgetting
                 curve, so search could put first what you were about to forget.
               </p>
               <p>
                 In October I pointed the same engine at AI agents. An agent that runs for weeks collects more memories than it
-                can use, so I asked a plain question: should it forget? In Engram, a memory fades unless it is recalled, and
+                can use, so I asked a plain question: should it forget? In Ebbtide, a memory fades unless it is recalled, and
                 every recall makes it last longer.
               </p>
               <p>
@@ -291,7 +291,7 @@ function Footer() {
         <a className="underline" href="https://commons.wikimedia.org/wiki/File:Santiago_Ram%C3%B3n_y_Cajal_dando_c%C3%A1tedra_en_su_laboratorio.jpg">Santiago Ramón y Cajal dando cátedra en su laboratorio</a>.
       </p>
       <div className="mx-auto grid max-w-[1280px] gap-2 text-muted-foreground min-[800px]:grid-cols-[1fr_auto_1fr] min-[800px]:items-baseline">
-        <span>Engram, memory for AI agents</span>
+        <span>Ebbtide, memory for AI agents</span>
         <span className="flex flex-wrap gap-x-6 gap-y-1 text-foreground">
           <a className="hover:underline" href={REPO}>GitHub</a>
           <a className="hover:underline" href="#results">Results</a>

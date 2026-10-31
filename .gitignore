@@ -13,7 +13,7 @@ env/
 # Environment
 .env
 
-# Memory databases (ENGRAM_DB)
+# Memory databases (EBBTIDE_DB)
 *.db
 *.db-*
 

@@ -1,4 +1,4 @@
-"""Engram MCP server: every tool through an in-process MCP client, on a temporary
+"""Ebbtide MCP server: every tool through an in-process MCP client, on a temporary
 database, with a fake clock and a stub embedder, so no model loads."""
 
 import asyncio
@@ -7,7 +7,7 @@ from types import SimpleNamespace
 
 from mcp import Client
 
-from engram_mcp import server
+from ebbtide import server
 from intelligence import embeddings
 
 DAY = 86400.0
@@ -21,9 +21,9 @@ def _embed(text):  # bag of words over a tiny vocabulary; the constant keeps it 
 def test_tools_round_trip(tmp_path, monkeypatch):
     clock = SimpleNamespace(now=0.0)
     db = tmp_path / "memory.db"
-    monkeypatch.setenv("ENGRAM_DB", str(db))
-    monkeypatch.setenv("ENGRAM_BUDGET", "2")
-    monkeypatch.delenv("ENGRAM_POLICY", raising=False)
+    monkeypatch.setenv("EBBTIDE_DB", str(db))
+    monkeypatch.setenv("EBBTIDE_BUDGET", "2")
+    monkeypatch.delenv("EBBTIDE_POLICY", raising=False)
     monkeypatch.setattr(embeddings, "embed_query", _embed)
     monkeypatch.setattr(server, "time", SimpleNamespace(time=lambda: clock.now))
 
@@ -60,7 +60,7 @@ def test_tools_round_trip(tmp_path, monkeypatch):
         (4, "remember", {"text": "Green tea after lunch"}),
     ]))
     assert [r.structured_content for r in second] == [
-        {"memories": 2, "budget": 2, "policy": "engram-count", "mean_strength": 0.781, "stored_ever": 2},
+        {"memories": 2, "budget": 2, "policy": "ebbtide-count", "mean_strength": 0.781, "stored_ever": 2},
         {"id": 3, "evicted": [2]},
         {"result": True},
         {"result": False},

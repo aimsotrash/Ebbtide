@@ -1,4 +1,4 @@
-"""Engram panel: what it serves, through its real HTTP handler, on a temporary database."""
+"""Ebbtide panel: what it serves, through its real HTTP handler, on a temporary database."""
 
 import json
 import threading
@@ -9,7 +9,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from engram_mcp import panel, server
+from ebbtide import panel, server
 from intelligence import embeddings
 
 DAY = 86400.0
@@ -17,9 +17,9 @@ DAY = 86400.0
 
 def test_panel_lists_strengths_and_looks_ahead(tmp_path, monkeypatch):
     clock = SimpleNamespace(now=0.0)
-    monkeypatch.setenv("ENGRAM_DB", str(tmp_path / "memory.db"))
-    monkeypatch.delenv("ENGRAM_POLICY", raising=False)
-    monkeypatch.delenv("ENGRAM_BUDGET", raising=False)
+    monkeypatch.setenv("EBBTIDE_DB", str(tmp_path / "memory.db"))
+    monkeypatch.delenv("EBBTIDE_POLICY", raising=False)
+    monkeypatch.delenv("EBBTIDE_BUDGET", raising=False)
     monkeypatch.setattr(embeddings, "embed_query", lambda text: [text.count("tea"), text.count("cat"), 0.1])
     monkeypatch.setattr(server, "time", SimpleNamespace(time=lambda: clock.now))
     monkeypatch.setattr(panel, "time", SimpleNamespace(time=lambda: clock.now))
@@ -49,11 +49,11 @@ def test_panel_lists_strengths_and_looks_ahead(tmp_path, monkeypatch):
     finally:
         httpd.shutdown()
 
-    assert (today["policy"], today["budget"], today["goes_first"]) == ("engram-count", 1000, None)
+    assert (today["policy"], today["budget"], today["goes_first"]) == ("ebbtide-count", 1000, None)
     tea, cat = today["memories"]  # strongest first: the tea memory was just recalled
     assert (tea["text"], tea["tags"], tea["strength"], tea["recalls"]) == ("Green tea after lunch", ["habit"], 1.0, 1)
     assert (cat["strength"], cat["half_life_days"]) == (0.717, 6.2)  # e^(-72 h / 216 h); ln 2 x 9 days
     assert tea["half_life_days"] == 8.4  # one recall: S = 1 + 0.5 ln 2
     assert [m["strength"] for m in week["memories"]] == [0.561, 0.329]  # the recalled one fades slower
-    monkeypatch.setenv("ENGRAM_BUDGET", "2")  # now full: the next add would drop the weaker memory
+    monkeypatch.setenv("EBBTIDE_BUDGET", "2")  # now full: the next add would drop the weaker memory
     assert panel.snapshot(clock.now)["goes_first"] == cat["id"]

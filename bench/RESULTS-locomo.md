@@ -28,8 +28,8 @@ whole conversations. With 10 conversations they are wide, and likely still somew
 | recency | 6.6 | 15.0 | 26.8 |
 | lru | 4.8 | 12.2 | 22.7 |
 | decay-only | 4.8 | 12.2 | 22.7 |
-| engram-count | 5.7 | 12.3 | 22.4 |
-| engram-spaced | 4.8 | 11.7 | 22.3 |
+| ebbtide-count | 5.7 | 12.3 | 22.4 |
+| ebbtide-spaced | 4.8 | 11.7 | 22.3 |
 
 keep-all ignores the budget, so its row repeats.
 
@@ -48,12 +48,12 @@ keep-all ignores the budget, so its row repeats.
 | decay-only @ 10% | 4.4 | 4.8 | 5.9 | 6.6 | 32.0 | 44.1 | 7.7 | 60 | 0.08 |
 | decay-only @ 25% | 10.2 | 12.2 | 14.4 | 17.4 | 41.1 | 54.7 | 21.1 | 150 | 0.14 |
 | decay-only @ 50% | 18.6 | 22.7 | 26.0 | 31.9 | 59.0 | 72.0 | 45.0 | 301 | 0.22 |
-| engram-count @ 10% | 4.7 | 5.7 | 7.0 | 8.3 | 35.4 | 47.3 | 9.3 | 60 | 0.08 |
-| engram-count @ 25% | 10.0 | 12.3 | 14.6 | 18.3 | 44.1 | 58.0 | 22.0 | 150 | 0.15 |
-| engram-count @ 50% | 17.8 | 22.4 | 24.7 | 31.3 | 61.5 | 74.8 | 45.2 | 301 | 0.23 |
-| engram-spaced @ 10% | 4.4 | 4.8 | 6.4 | 7.1 | 35.2 | 49.2 | 7.9 | 60 | 0.08 |
-| engram-spaced @ 25% | 9.7 | 11.7 | 14.8 | 18.9 | 48.0 | 60.7 | 21.4 | 150 | 0.15 |
-| engram-spaced @ 50% | 17.6 | 22.3 | 25.2 | 32.4 | 59.0 | 72.4 | 45.2 | 301 | 0.23 |
+| ebbtide-count @ 10% | 4.7 | 5.7 | 7.0 | 8.3 | 35.4 | 47.3 | 9.3 | 60 | 0.08 |
+| ebbtide-count @ 25% | 10.0 | 12.3 | 14.6 | 18.3 | 44.1 | 58.0 | 22.0 | 150 | 0.15 |
+| ebbtide-count @ 50% | 17.8 | 22.4 | 24.7 | 31.3 | 61.5 | 74.8 | 45.2 | 301 | 0.23 |
+| ebbtide-spaced @ 10% | 4.4 | 4.8 | 6.4 | 7.1 | 35.2 | 49.2 | 7.9 | 60 | 0.08 |
+| ebbtide-spaced @ 25% | 9.7 | 11.7 | 14.8 | 18.9 | 48.0 | 60.7 | 21.4 | 150 | 0.15 |
+| ebbtide-spaced @ 50% | 17.6 | 22.3 | 25.2 | 32.4 | 59.0 | 72.4 | 45.2 | 301 | 0.23 |
 
 ## turn_all@10 by category, at a 25% budget
 
@@ -64,18 +64,18 @@ keep-all ignores the budget, so its row repeats.
 | recency @ 25% | 2.1 | 15.6 | 4.3 | 20.3 |
 | lru @ 25% | 1.4 | 15.6 | 3.3 | 15.5 |
 | decay-only @ 25% | 1.4 | 15.6 | 3.3 | 15.5 |
-| engram-count @ 25% | 1.4 | 18.1 | 3.3 | 14.7 |
-| engram-spaced @ 25% | 2.1 | 18.1 | 1.1 | 13.7 |
+| ebbtide-count @ 25% | 1.4 | 18.1 | 3.3 | 14.7 |
+| ebbtide-spaced @ 25% | 2.1 | 18.1 | 1.1 | 13.7 |
 
-## Both Engram variants against LRU
+## Both Ebbtide variants against LRU
 
 Chosen after the LongMemEval results and before this run. Each cell is the variant minus LRU, in points, with a 95% interval:
 
 | variant | metric | 10% budget | 25% budget | 50% budget |
 |---|---|---|---|---|
-| engram-count | turn_all@10 | +0.9 [+0.2, +1.5] | +0.1 [-1.2, +1.5] | -0.3 [-1.9, +1.1] |
-| engram-count | session_all@10 | +3.4 [+1.5, +5.1] | +3.0 [-0.1, +6.7] | +2.5 [+0.5, +5.4] |
-| engram-count | evidence_kept | +1.6 [+0.6, +2.5] | +0.9 [-0.3, +2.1] | +0.2 [-2.1, +2.9] |
-| engram-spaced | turn_all@10 | +0.1 [-0.8, +1.0] | -0.5 [-2.3, +1.6] | -0.4 [-3.0, +2.2] |
-| engram-spaced | session_all@10 | +3.2 [+1.4, +4.9] | +7.0 [+2.7, +11.2] | +0.1 [-3.3, +3.1] |
-| engram-spaced | evidence_kept | +0.3 [-1.2, +1.8] | +0.2 [-2.2, +3.2] | +0.3 [-4.8, +5.4] |
+| ebbtide-count | turn_all@10 | +0.9 [+0.2, +1.5] | +0.1 [-1.2, +1.5] | -0.3 [-1.9, +1.1] |
+| ebbtide-count | session_all@10 | +3.4 [+1.5, +5.1] | +3.0 [-0.1, +6.7] | +2.5 [+0.5, +5.4] |
+| ebbtide-count | evidence_kept | +1.6 [+0.6, +2.5] | +0.9 [-0.3, +2.1] | +0.2 [-2.1, +2.9] |
+| ebbtide-spaced | turn_all@10 | +0.1 [-0.8, +1.0] | -0.5 [-2.3, +1.6] | -0.4 [-3.0, +2.2] |
+| ebbtide-spaced | session_all@10 | +3.2 [+1.4, +4.9] | +7.0 [+2.7, +11.2] | +0.1 [-3.3, +3.1] |
+| ebbtide-spaced | evidence_kept | +0.3 [-1.2, +1.8] | +0.2 [-2.2, +3.2] | +0.3 [-4.8, +5.4] |

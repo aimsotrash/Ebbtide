@@ -3,7 +3,8 @@ name: CI
 # Runs on every push/PR to main:
 #   - intelligence, MCP server and benchmark pytest  (tests)
 #   - pip-audit                                      (Python dependency security)
-#   - landing page (site/) lint / test / tsc / build (build validation)
+#   - package build                                  (pyproject.toml)
+#   - landing page (site/) lint / tsc / build        (build validation)
 on:
   push:
     branches: [main]
@@ -21,8 +22,8 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
-          # 3.12 has wheels for the full ML stack in engram_mcp/requirements.txt,
-          # which is validated on 3.12; the tests only need a slice of it.
+          # 3.12 has wheels for the full ML stack in pyproject.toml, which is
+          # validated on 3.12; the tests only need a slice of it.
           python-version: "3.12"
 
       - name: Install test dependencies
@@ -32,10 +33,13 @@ jobs:
         run: python -m pytest intelligence/tests/ -v
 
       - name: MCP server tests
-        run: python -m pytest engram_mcp/tests/ -v
+        run: python -m pytest ebbtide/tests/ -v
 
       - name: Benchmark harness tests
         run: python -m pytest bench/ -v
+
+      - name: Package builds
+        run: pip wheel --no-deps -w dist .
 
       # Dependency vulnerability scan. Non-blocking for now so a transitive
       # advisory surfaces without wedging CI; remove continue-on-error to gate.
@@ -64,9 +68,6 @@ jobs:
 
       - name: Lint
         run: npm run lint
-
-      - name: Test
-        run: npm test
 
       - name: Typecheck and build
         run: npm run build

@@ -95,7 +95,7 @@ export function Panel({ focus }: { focus?: Part | null }) {
 
       <div data-part="stats" className={cn('mt-2 flex flex-wrap gap-x-4 gap-y-1 rounded-sm px-1 pt-3 text-[13px] text-[#5c6370] tabular-nums dark:text-[#9aa1ad]', lit('stats'))}>
         <span>budget {BUDGET.toLocaleString('en-US')}</span>
-        <span>policy engram-count</span>
+        <span>policy ebbtide-count</span>
         <span>mean strength {pct(mean)}</span>
       </div>
     </div>

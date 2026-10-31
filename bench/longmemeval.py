@@ -40,8 +40,8 @@ SCALES = (24.0, 72.0, 216.0, 648.0)
 TUNED = {
     "keep-all, decay-ranked": Policy(evict=None, strengthen="spaced"),
     "decay-only": POLICIES["decay-only"],
-    "engram-count": POLICIES["engram-count"],
-    "engram-spaced": POLICIES["engram-spaced"],
+    "ebbtide-count": POLICIES["ebbtide-count"],
+    "ebbtide-spaced": POLICIES["ebbtide-spaced"],
 }
 DATE_FORMAT = "%Y/%m/%d (%a) %H:%M"
 
@@ -266,7 +266,7 @@ def _pct(value: float | None) -> str:
     return "–" if value is None else f"{100 * value:.1f}"
 
 
-ORDER = ["keep-all", "keep-all, decay-ranked", "recency", "lru", "decay-only", "engram-count", "engram-spaced"]
+ORDER = ["keep-all", "keep-all, decay-ranked", "recency", "lru", "decay-only", "ebbtide-count", "ebbtide-spaced"]
 
 
 def label(key: tuple) -> str:
@@ -304,15 +304,15 @@ def _report(counts: dict, chosen: dict, configs: dict, results: dict, minutes: f
         for k in rows if k[1] in (None, 0.25)
     ])
 
-    # Losses: engram-spaced against the better of the two budgeted baselines, per type.
+    # Losses: ebbtide-spaced against the better of the two budgeted baselines, per type.
     loss_lines, losses = [], []
     for t in [*types, "all"]:
         cells = []
         for f in BUDGETS:
             idx = [j for j, i in enumerate(_TEST_INDEX) if t == "all" or _PLANS[i].qtype == t]
-            pick = [j for j in idx if test[("engram-spaced", f)][j].get(PRIMARY) is not None]
+            pick = [j for j in idx if test[("ebbtide-spaced", f)][j].get(PRIMARY) is not None]
             base = max(("recency", "lru"), key=lambda n: mean([test[(n, f)][j] for j in pick], PRIMARY))
-            diffs = [test[("engram-spaced", f)][j][PRIMARY] - test[(base, f)][j][PRIMARY] for j in pick]
+            diffs = [test[("ebbtide-spaced", f)][j][PRIMARY] - test[(base, f)][j][PRIMARY] for j in pick]
             d, (lo, hi) = sum(diffs) / len(diffs), _bootstrap(diffs)
             cells.append(f"{100 * d:+.1f} [{100 * lo:+.1f}, {100 * hi:+.1f}] vs {base}")
             if d < 0:
@@ -326,7 +326,7 @@ def _report(counts: dict, chosen: dict, configs: dict, results: dict, minutes: f
 
     posthoc = table(["variant", "metric", *(f"{f:.0%} budget" for f in BUDGETS)], [
         [name, metric, *(against_lru(name, metric, f) for f in BUDGETS)]
-        for name in ("engram-count", "engram-spaced")
+        for name in ("ebbtide-count", "ebbtide-spaced")
         for metric in (PRIMARY, "session_all@10", "evidence_kept", "latest@10")
     ])
 
@@ -375,19 +375,19 @@ keep-all ignores the budget, so its row repeats.
 
 {per_type}
 
-## Where engram-spaced loses
+## Where ebbtide-spaced loses
 
-engram-spaced was named in advance as the headline. Each cell is engram-spaced minus whichever
+ebbtide-spaced was named in advance as the headline. Each cell is ebbtide-spaced minus whichever
 of recency and LRU did better in that cell, in {PRIMARY} points, with a 95% paired bootstrap
 interval:
 
 {table(["question type", *(f"{f:.0%} budget" for f in BUDGETS)], loss_lines)}
 
-{"engram-spaced trails in: " + ", ".join(losses) + "." if losses else "engram-spaced trails nowhere."}
+{"ebbtide-spaced trails in: " + ", ".join(losses) + "." if losses else "ebbtide-spaced trails nowhere."}
 
 ## Added after seeing the results: both variants against LRU
 
-engram-count did better than the headline variant, so both are compared with LRU here, the
+ebbtide-count did better than the headline variant, so both are compared with LRU here, the
 strongest baseline, on the metrics that separate them, with the same 95% paired intervals.
 These comparisons were not named in advance and many were made, so read them as exploratory.
 

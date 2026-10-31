@@ -30,8 +30,8 @@ def test_recall_ranks_by_similarity_and_refreshes_hits():
     ("recency", "m1", "m1"),
     ("lru", "m2", "m1"),
     ("decay-only", "m2", "m1"),     # LRU's evictions, since S stays 1
-    ("engram-count", "m2", "m2"),   # the recall made m1 outlast the newer m2
-    ("engram-spaced", "m2", "m2"),
+    ("ebbtide-count", "m2", "m2"),   # the recall made m1 outlast the newer m2
+    ("ebbtide-spaced", "m2", "m2"),
 ])
 def test_eviction_by_policy(name, victim_a, victim_b):
     # A: m1 is recalled after m2 is added, so m1 was used more recently.
@@ -88,7 +88,7 @@ def test_decay_ranking_prefers_the_stronger_of_equal_matches(fusion):
 
 
 def test_budget_forget_stats_and_guards():
-    store = MemoryStore(POLICIES["engram-spaced"], budget=3)
+    store = MemoryStore(POLICIES["ebbtide-spaced"], budget=3)
     for day in range(10):
         store.add(f"m{day}", X, now=day * DAY)
     assert [m.text for m in store.memories] == ["m7", "m8", "m9"]

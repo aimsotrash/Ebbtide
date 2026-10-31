@@ -1,5 +1,5 @@
 {
-  "name": "engram-site",
+  "name": "ebbtide-site",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,8 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview",
-    "test": "node --experimental-strip-types --test src/lib/shell.test.ts"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.3.0",

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Engram memory</title>
+<title>Ebbtide memory</title>
 <style>
   @font-face { font-family: "Geist"; src: url(/geist.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
   :root {
@@ -93,7 +93,7 @@
   const tabs = [...document.querySelectorAll('[role="tab"]')];
   const EMPTY = "No memories yet. Ask your agent to remember something.";
   const NONE_FADING = "No memory is under 50%.";
-  const DOWN = "Can't reach the panel server. Is python -m engram_mcp.panel running?";
+  const DOWN = "Can't reach the panel server. Is ebbtide-panel running?";
   const num = (n) => n.toLocaleString("en-US");
   const pct = (m) => Math.round(100 * m.strength);
   const put = (el, text) => { if (el.textContent !== text) el.textContent = text; };  // a live region repeats every write

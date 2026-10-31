@@ -1,4 +1,4 @@
-"""Engram's memory engine, which the MCP server (engram_mcp/) and the benchmarks (bench/)
+"""Ebbtide's memory engine, which the MCP server (ebbtide/) and the benchmarks (bench/)
 are built on.
 
 Subpackages:
