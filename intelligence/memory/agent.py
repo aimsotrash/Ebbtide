@@ -72,14 +72,14 @@ DECAY_WEIGHT = 0.0
 
 # Each step down the list changes one thing. With S fixed at 1, lowest-R eviction is
 # exactly LRU's order, so decay-only vs lru measures the ranking term alone, and
-# engram-* vs decay-only measures strengthening alone.
+# ebbtide-* vs decay-only measures strengthening alone.
 POLICIES = {
     "keep-all": Policy(evict=None),
     "recency": Policy(evict="created"),
     "lru": Policy(evict="used"),
     "decay-only": Policy(evict="retrievability", weight=DECAY_WEIGHT),
-    "engram-count": Policy(evict="retrievability", weight=DECAY_WEIGHT, strengthen="count"),
-    "engram-spaced": Policy(evict="retrievability", weight=DECAY_WEIGHT, strengthen="spaced"),
+    "ebbtide-count": Policy(evict="retrievability", weight=DECAY_WEIGHT, strengthen="count"),
+    "ebbtide-spaced": Policy(evict="retrievability", weight=DECAY_WEIGHT, strengthen="spaced"),
 }
 
 

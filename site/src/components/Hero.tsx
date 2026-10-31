@@ -62,11 +62,11 @@ export function Hero() {
   return (
     <header id="top" className="relative flex min-h-svh flex-col bg-field px-[var(--margin)] text-field-ink [--ring:#8aa4ff]">
       <nav className="mx-auto flex w-full max-w-[1280px] items-center justify-between pt-7" aria-label="Main">
-        <a href="#top" className="text-[14px] font-semibold">Engram</a>
+        <a href="#top" className="text-[14px] font-semibold">Ebbtide</a>
         <div className="flex items-center gap-6 text-[14px]">
           <a href="#how" className="hidden hover:underline sm:inline">How it works</a>
           <a href="#results" className="hidden hover:underline sm:inline">Results</a>
-          <a href="https://github.com/aimsotrash/Engram" className="hidden hover:underline sm:inline">GitHub</a>
+          <a href="https://github.com/aimsotrash/Ebbtide" className="hidden hover:underline sm:inline">GitHub</a>
           <a href="#install" className="inline-flex h-11 items-center bg-blue px-5 font-medium text-blue-ink transition-transform hover:scale-[1.03] active:scale-[0.97]">
             Install
           </a>

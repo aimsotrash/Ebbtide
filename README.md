@@ -1,17 +1,19 @@
-# Engram
+# Ebbtide
 
-[![CI](https://github.com/aimsotrash/Engram/actions/workflows/ci.yml/badge.svg)](https://github.com/aimsotrash/Engram/actions/workflows/ci.yml)
+[![CI](https://github.com/aimsotrash/Ebbtide/actions/workflows/ci.yml/badge.svg)](https://github.com/aimsotrash/Ebbtide/actions/workflows/ci.yml)
 
 **Long-term memory for AI agents that forgets on purpose.**
 
-Engram began as a notes app. I retired the notes app in October 2026; its last version is
-the git tag [`notes-app`](https://github.com/aimsotrash/Engram/tree/notes-app).
+Ebbtide was called Engram until October 31, 2026; I renamed it because several other memory
+servers for AI agents already use that name. It began as a notes app, which I retired in
+October 2026; its last version is the git tag
+[`notes-app`](https://github.com/aimsotrash/Ebbtide/tree/notes-app).
 
 **Live:** [aimsotrash-engram.vercel.app](https://aimsotrash-engram.vercel.app)
 
 ## Memory for AI agents
 
-[`engram_mcp/`](engram_mcp/README.md) is an MCP server that gives an agent such as Claude
+[`ebbtide/`](ebbtide/README.md) is an MCP server that gives an agent such as Claude
 Code long-term memory across sessions, through four tools: `remember`, `recall`, `forget`
 and `memory_stats`. Each memory fades along a forgetting curve unless it is recalled, and
 every recall makes it last longer. When the store reaches its budget, 1000 memories by
@@ -19,8 +21,8 @@ default, the weakest one goes first. The memories live in a SQLite file on your 
 and only what a recall returns enters the agent's context.
 
 A local panel lists the memories and how strong each one is, with a slider that looks
-ahead to show which ones are fading. Setup is three commands; see
-[`engram_mcp/README.md`](engram_mcp/README.md).
+ahead to show which ones are fading. Setup is two commands; see
+[`ebbtide/README.md`](ebbtide/README.md).
 
 ### Should an agent forget?
 
@@ -37,7 +39,7 @@ nothing was tuned on it.
   questions and 27% of LoCoMo questions. Keeping everything does for 58.5% and 44.6%.
 - **No forgetting rule wins everywhere.** On LongMemEval, keeping what gets used beats
   keeping the newest. On LoCoMo, keeping the newest does best at the turn level.
-- **Strengthening on recall beats plain LRU, modestly.** engram-count, the server's
+- **Strengthening on recall beats plain LRU, modestly.** ebbtide-count, the server's
   default, keeps up to 4 points more of the evidence than LRU on LongMemEval, and ranks every
   answer session in its top 10 up to 14 points more often; I chose these comparisons after
   seeing the results. On LoCoMo, where I chose the comparison before running it, both gains
@@ -59,11 +61,12 @@ Tailwind CSS · Motion
 
 ## Run it locally
 
-To run the MCP server, follow the setup in [`engram_mcp/README.md`](engram_mcp/README.md).
+To run the MCP server, follow the setup in [`ebbtide/README.md`](ebbtide/README.md).
 
-To reproduce the benchmarks, in the `.venv` from that setup:
+To reproduce the benchmarks, from the repo root:
 
 ```bash
+uv venv -p 3.12 .venv && uv pip install --python .venv -e .   # CPU-only PyTorch, per pyproject.toml
 .venv/bin/python -m bench.longmemeval embed   # downloads the data and embeds it once, ~45 min on a laptop CPU
 .venv/bin/python -m bench.longmemeval run     # writes bench/RESULTS.md
 .venv/bin/python -m bench.locomo              # writes bench/RESULTS-locomo.md
@@ -75,12 +78,13 @@ The landing page for the MCP server lives in `site/` (Vite, React and Tailwind):
 cd site && npm install && npm run dev   # http://localhost:5173
 ```
 
-The Python tests (18: 12 intelligence, 2 MCP server, 4 benchmark) stub the embedding model,
-so they need only `requirements-test.txt`, which adds pytest:
+The Python tests (19: 13 intelligence, 2 MCP server, 4 benchmark) stub the embedding model,
+so they need only `requirements-test.txt`, which adds pytest; any venv works, such as the one
+above or a fresh `uv venv -p 3.12 .venv`:
 
 ```bash
-.venv/bin/pip install -r requirements-test.txt
-.venv/bin/python -m pytest intelligence/tests engram_mcp/tests bench
+uv pip install --python .venv -r requirements-test.txt
+.venv/bin/python -m pytest intelligence/tests ebbtide/tests bench
 ```
 
 ## References

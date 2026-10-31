@@ -1,9 +1,9 @@
 """
 A quiet local page that lists the agent's memories and how strong each one is.
 
-  python -m engram_mcp.panel [--port 8765]   # then open http://127.0.0.1:8765
+  ebbtide-panel [--port 8765]   # then open http://127.0.0.1:8765
 
-It reads the server's database (ENGRAM_DB) read-only on every request, so each remember,
+It reads the server's database (EBBTIDE_DB) read-only on every request, so each remember,
 recall and eviction shows up within a couple of seconds. The look-ahead slider shows how
 strong each memory would be after that many more days without a recall.
 """
@@ -20,7 +20,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
-from engram_mcp.server import _config, _iso, _load
+from ebbtide.server import _config, _iso, _load
 from intelligence.memory import POLICIES, MemoryStore
 
 PAGE = Path(__file__).with_name("panel.html")
@@ -86,13 +86,13 @@ class _Handler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(prog="python -m engram_mcp.panel", description=__doc__.split("\n\n")[0])
+    parser = argparse.ArgumentParser(prog="ebbtide-panel", description=__doc__.split("\n\n")[0])
     parser.add_argument("--port", type=int, default=8765)
     args = parser.parse_args()
     db, policy, budget = _config()
-    MemoryStore(POLICIES[policy], budget)  # a bad ENGRAM_* value fails here
+    MemoryStore(POLICIES[policy], budget)  # a bad EBBTIDE_* value fails here
     server = ThreadingHTTPServer(("127.0.0.1", args.port), _Handler)  # this machine only
-    print(f"Engram panel for {db}: http://127.0.0.1:{args.port} (Ctrl+C stops it)", flush=True)
+    print(f"Ebbtide panel for {db}: http://127.0.0.1:{args.port} (Ctrl+C stops it)", flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

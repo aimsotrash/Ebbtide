@@ -33,8 +33,8 @@ needs the outdated fact, which a forgetting memory should drop.
 | recency | 5.8 | 12.4 | 22.2 |
 | lru | 6.3 | 15.6 | 33.1 |
 | decay-only | 6.3 | 15.6 | 33.1 |
-| engram-count | 6.9 | 15.9 | 36.8 |
-| engram-spaced | 7.7 | 14.3 | 31.7 |
+| ebbtide-count | 6.9 | 15.9 | 36.8 |
+| ebbtide-spaced | 7.7 | 14.3 | 31.7 |
 
 keep-all ignores the budget, so its row repeats.
 
@@ -53,12 +53,12 @@ keep-all ignores the budget, so its row repeats.
 | decay-only @ 10% | 5.0 | 6.3 | 18.3 | 22.2 | 12.7 | 44.2 | 14.2 | 27.6 | 49 | 0.15 |
 | decay-only @ 25% | 13.0 | 15.6 | 39.4 | 44.7 | 36.2 | 73.5 | 35.2 | 55.2 | 123 | 0.28 |
 | decay-only @ 50% | 23.0 | 33.1 | 59.3 | 69.3 | 79.1 | 93.1 | 64.1 | 81.0 | 246 | 0.46 |
-| engram-count @ 10% | 5.3 | 6.9 | 23.0 | 26.7 | 15.9 | 51.9 | 16.4 | 29.3 | 49 | 0.14 |
-| engram-count @ 25% | 12.4 | 15.9 | 44.2 | 50.0 | 50.3 | 80.7 | 38.3 | 56.9 | 123 | 0.28 |
-| engram-count @ 50% | 27.2 | 36.8 | 59.8 | 71.7 | 84.4 | 94.7 | 68.0 | 77.6 | 246 | 0.48 |
-| engram-spaced @ 10% | 6.3 | 7.7 | 17.7 | 22.5 | 25.7 | 59.3 | 15.3 | 15.5 | 49 | 0.15 |
-| engram-spaced @ 25% | 10.8 | 14.3 | 39.4 | 46.3 | 55.8 | 86.2 | 34.6 | 37.9 | 123 | 0.28 |
-| engram-spaced @ 50% | 25.1 | 31.7 | 60.6 | 69.0 | 84.1 | 95.5 | 65.3 | 63.8 | 246 | 0.44 |
+| ebbtide-count @ 10% | 5.3 | 6.9 | 23.0 | 26.7 | 15.9 | 51.9 | 16.4 | 29.3 | 49 | 0.14 |
+| ebbtide-count @ 25% | 12.4 | 15.9 | 44.2 | 50.0 | 50.3 | 80.7 | 38.3 | 56.9 | 123 | 0.28 |
+| ebbtide-count @ 50% | 27.2 | 36.8 | 59.8 | 71.7 | 84.4 | 94.7 | 68.0 | 77.6 | 246 | 0.48 |
+| ebbtide-spaced @ 10% | 6.3 | 7.7 | 17.7 | 22.5 | 25.7 | 59.3 | 15.3 | 15.5 | 49 | 0.15 |
+| ebbtide-spaced @ 25% | 10.8 | 14.3 | 39.4 | 46.3 | 55.8 | 86.2 | 34.6 | 37.9 | 123 | 0.28 |
+| ebbtide-spaced @ 50% | 25.1 | 31.7 | 60.6 | 69.0 | 84.1 | 95.5 | 65.3 | 63.8 | 246 | 0.44 |
 
 ## turn_all@10 by question type, at a 25% budget
 
@@ -69,12 +69,12 @@ keep-all ignores the budget, so its row repeats.
 | recency @ 25% | 5.2 | 0.0 | 26.7 | 29.2 | 29.4 | 9.8 |
 | lru @ 25% | 5.2 | 3.1 | 28.9 | 25.0 | 33.3 | 16.7 |
 | decay-only @ 25% | 5.2 | 3.1 | 28.9 | 25.0 | 33.3 | 16.7 |
-| engram-count @ 25% | 5.2 | 6.1 | 24.4 | 25.0 | 29.4 | 18.6 |
-| engram-spaced @ 25% | 12.1 | 4.1 | 22.2 | 20.8 | 29.4 | 12.7 |
+| ebbtide-count @ 25% | 5.2 | 6.1 | 24.4 | 25.0 | 29.4 | 18.6 |
+| ebbtide-spaced @ 25% | 12.1 | 4.1 | 22.2 | 20.8 | 29.4 | 12.7 |
 
-## Where engram-spaced loses
+## Where ebbtide-spaced loses
 
-engram-spaced was named in advance as the headline. Each cell is engram-spaced minus whichever
+ebbtide-spaced was named in advance as the headline. Each cell is ebbtide-spaced minus whichever
 of recency and LRU did better in that cell, in turn_all@10 points, with a 95% paired bootstrap
 interval:
 
@@ -88,24 +88,24 @@ interval:
 | temporal-reasoning | +0.0 [-3.9, +3.9] vs lru | -3.9 [-10.8, +2.9] vs lru | -2.0 [-7.8, +2.9] vs lru |
 | all | +1.3 [-0.8, +3.4] vs lru | -1.3 [-5.3, +2.6] vs lru | -1.3 [-5.6, +2.9] vs lru |
 
-engram-spaced trails in: knowledge-update at 50%, single-session-assistant at 25%, single-session-assistant at 50%, single-session-preference at 25%, single-session-preference at 50%, single-session-user at 25%, temporal-reasoning at 25%, temporal-reasoning at 50%, all at 25%, all at 50%.
+ebbtide-spaced trails in: knowledge-update at 50%, single-session-assistant at 25%, single-session-assistant at 50%, single-session-preference at 25%, single-session-preference at 50%, single-session-user at 25%, temporal-reasoning at 25%, temporal-reasoning at 50%, all at 25%, all at 50%.
 
 ## Added after seeing the results: both variants against LRU
 
-engram-count did better than the headline variant, so both are compared with LRU here, the
+ebbtide-count did better than the headline variant, so both are compared with LRU here, the
 strongest baseline, on the metrics that separate them, with the same 95% paired intervals.
 These comparisons were not named in advance and many were made, so read them as exploratory.
 
 | variant | metric | 10% budget | 25% budget | 50% budget |
 |---|---|---|---|---|
-| engram-count | turn_all@10 | +0.5 [-0.5, +1.6] | +0.3 [-2.4, +2.9] | +3.7 [+0.3, +7.4] |
-| engram-count | session_all@10 | +3.2 [+0.8, +5.6] | +14.0 [+9.8, +18.5] | +5.3 [+2.4, +8.2] |
-| engram-count | evidence_kept | +2.2 [+0.6, +3.9] | +3.2 [+0.4, +5.9] | +3.9 [+1.3, +6.5] |
-| engram-count | latest@10 | +1.7 [-5.2, +8.6] | +1.7 [-8.6, +12.1] | -3.4 [-13.8, +5.2] |
-| engram-spaced | turn_all@10 | +1.3 [-0.8, +3.4] | -1.3 [-5.3, +2.6] | -1.3 [-5.6, +2.9] |
-| engram-spaced | session_all@10 | +13.0 [+9.0, +16.9] | +19.6 [+13.2, +25.9] | +5.0 [+1.1, +9.0] |
-| engram-spaced | evidence_kept | +1.1 [-1.4, +3.6] | -0.6 [-4.7, +3.4] | +1.1 [-2.5, +4.8] |
-| engram-spaced | latest@10 | -12.1 [-22.4, -3.4] | -17.2 [-31.0, -3.4] | -17.2 [-29.3, -6.9] |
+| ebbtide-count | turn_all@10 | +0.5 [-0.5, +1.6] | +0.3 [-2.4, +2.9] | +3.7 [+0.3, +7.4] |
+| ebbtide-count | session_all@10 | +3.2 [+0.8, +5.6] | +14.0 [+9.8, +18.5] | +5.3 [+2.4, +8.2] |
+| ebbtide-count | evidence_kept | +2.2 [+0.6, +3.9] | +3.2 [+0.4, +5.9] | +3.9 [+1.3, +6.5] |
+| ebbtide-count | latest@10 | +1.7 [-5.2, +8.6] | +1.7 [-8.6, +12.1] | -3.4 [-13.8, +5.2] |
+| ebbtide-spaced | turn_all@10 | +1.3 [-0.8, +3.4] | -1.3 [-5.3, +2.6] | -1.3 [-5.6, +2.9] |
+| ebbtide-spaced | session_all@10 | +13.0 [+9.0, +16.9] | +19.6 [+13.2, +25.9] | +5.0 [+1.1, +9.0] |
+| ebbtide-spaced | evidence_kept | +1.1 [-1.4, +3.6] | -0.6 [-4.7, +3.4] | +1.1 [-2.5, +4.8] |
+| ebbtide-spaced | latest@10 | -12.1 [-22.4, -3.4] | -17.2 [-31.0, -3.4] | -17.2 [-29.3, -6.9] |
 
 ## Settings picked on dev
 
@@ -115,12 +115,12 @@ These comparisons were not named in advance and many were made, so read them as 
 | decay-only | 10% | add | 0 | 24 | 8.7 |
 | decay-only | 25% | add | 0 | 24 | 25.0 |
 | decay-only | 50% | add | 0 | 24 | 43.5 |
-| engram-count | 10% | add | 0 | 24 | 10.9 |
-| engram-count | 25% | add | 0 | 24 | 28.3 |
-| engram-count | 50% | add | 0.01 | 216 | 45.7 |
-| engram-spaced | 10% | add | 0 | 648 | 12.0 |
-| engram-spaced | 25% | add | 0 | 216 | 23.9 |
-| engram-spaced | 50% | add | 0 | 648 | 43.5 |
+| ebbtide-count | 10% | add | 0 | 24 | 10.9 |
+| ebbtide-count | 25% | add | 0 | 24 | 28.3 |
+| ebbtide-count | 50% | add | 0.01 | 216 | 45.7 |
+| ebbtide-spaced | 10% | add | 0 | 648 | 12.0 |
+| ebbtide-spaced | 25% | add | 0 | 216 | 23.9 |
+| ebbtide-spaced | 50% | add | 0 | 648 | 43.5 |
 
 ## Check: the agent recalls 10 per turn instead of 5
 
@@ -133,5 +133,5 @@ Same settings, same test questions.
 | recency | 5.8 | 12.4 | 22.2 |
 | lru | 6.1 | 14.3 | 29.9 |
 | decay-only | 6.1 | 14.3 | 29.9 |
-| engram-count | 6.9 | 16.4 | 33.6 |
-| engram-spaced | 5.8 | 11.9 | 29.4 |
+| ebbtide-count | 6.9 | 16.4 | 33.6 |
+| ebbtide-spaced | 5.8 | 11.9 | 29.4 |

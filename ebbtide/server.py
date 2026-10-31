@@ -1,13 +1,13 @@
 """
-Engram as an MCP server: long-term memory for AI agents, over stdio.
+Ebbtide as an MCP server: long-term memory for AI agents, over stdio.
 
 Every tool call is one SQLite transaction: load the store, apply the call, write back
 what changed. Nothing is kept between calls, so two agents sharing a database (two
 Claude Code sessions, say) can't overwrite each other's memories.
 
-  ENGRAM_DB      SQLite file, default ~/.local/share/engram/memory.db
-  ENGRAM_POLICY  a name from intelligence.memory.POLICIES, default engram-count
-  ENGRAM_BUDGET  most memories kept, default 1000
+  EBBTIDE_DB      SQLite file, default ~/.local/share/ebbtide/memory.db
+  EBBTIDE_POLICY  a name from intelligence.memory.POLICIES, default ebbtide-count
+  EBBTIDE_BUDGET  most memories kept, default 1000
 """
 
 from __future__ import annotations
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS memories (
 """
 
 mcp = MCPServer(
-    "engram",
+    "ebbtide",
     instructions=(
         "Long-term memory that lasts across sessions. Memories fade unless they are "
         "recalled, and each recall makes one last longer. Use remember for facts, "
@@ -56,11 +56,11 @@ mcp = MCPServer(
 
 
 def _config() -> tuple[Path, str, int]:
-    db = Path(os.environ.get("ENGRAM_DB", "~/.local/share/engram/memory.db")).expanduser().resolve()
-    policy = os.environ.get("ENGRAM_POLICY", "engram-count")
+    db = Path(os.environ.get("EBBTIDE_DB", "~/.local/share/ebbtide/memory.db")).expanduser().resolve()
+    policy = os.environ.get("EBBTIDE_POLICY", "ebbtide-count")
     if policy not in POLICIES:
-        raise ValueError(f"ENGRAM_POLICY must be one of {sorted(POLICIES)}, got {policy!r}")
-    return db, policy, int(os.environ.get("ENGRAM_BUDGET", "1000"))
+        raise ValueError(f"EBBTIDE_POLICY must be one of {sorted(POLICIES)}, got {policy!r}")
+    return db, policy, int(os.environ.get("EBBTIDE_BUDGET", "1000"))
 
 
 def _stored_ever(conn: sqlite3.Connection) -> int:
@@ -179,9 +179,9 @@ def memory_stats() -> dict[str, Any]:
 
 def main() -> None:
     _, policy, budget = _config()
-    MemoryStore(POLICIES[policy], budget)  # a bad ENGRAM_* value fails here, not on the first call
+    MemoryStore(POLICIES[policy], budget)  # a bad EBBTIDE_* value fails here, not on the first call
     # Claude Code starts the server in the project it has open. Leave it, so nothing there (a
-    # folder named like the model, say) is ever loaded; `-P` keeps it off sys.path at launch.
-    os.environ["ENGRAM_DB"] = str(_config()[0])  # a relative path still means the project's
+    # folder named like the model, say) is ever loaded.
+    os.environ["EBBTIDE_DB"] = str(_config()[0])  # a relative path still means the project's
     os.chdir(Path(__file__).resolve().parent)
     mcp.run()

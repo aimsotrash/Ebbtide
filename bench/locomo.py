@@ -131,7 +131,7 @@ def _report(results: dict, counts: dict, minutes: float) -> str:
 
     versus = table(["variant", "metric", *(f"{f:.0%} budget" for f in BUDGETS)], [
         [name, metric, *(against_lru(name, metric, f) for f in BUDGETS)]
-        for name in ("engram-count", "engram-spaced")
+        for name in ("ebbtide-count", "ebbtide-spaced")
         for metric in (PRIMARY, "session_all@10", "evidence_kept")
     ])
 
@@ -170,7 +170,7 @@ keep-all ignores the budget, so its row repeats.
 
 {per_category}
 
-## Both Engram variants against LRU
+## Both Ebbtide variants against LRU
 
 Chosen after the LongMemEval results and before this run. Each cell is the variant minus LRU, in points, with a 95% interval:
 

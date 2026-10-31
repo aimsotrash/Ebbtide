@@ -47,11 +47,11 @@ def test_replay_keeps_recalled_evidence_only_when_recall_strengthens():
     emb = np.array([[1, 0, 0], [0, 1, 0], [0.9, 0.1, 0], [0, 0, 1], [1, 0, 0.1]], dtype=np.float32)
     p = plan(q, {t: i for i, t in enumerate(texts)})
     # With room for 2 memories, recency drops the evidence when "where did I park?" arrives.
-    # engram-spaced recalls the evidence for that turn first, which keeps it strongest.
+    # ebbtide-spaced recalls the evidence for that turn first, which keeps it strongest.
     forgetful = replay(p, POLICIES["recency"], 2, 1, emb)
-    engram = replay(p, POLICIES["engram-spaced"], 2, 1, emb)
+    ebbtide = replay(p, POLICIES["ebbtide-spaced"], 2, 1, emb)
     assert (forgetful["evidence_kept"], forgetful["turn_all@5"]) == (0.0, 0.0)
-    assert (engram["evidence_kept"], engram["turn_all@5"], engram["memories"]) == (1.0, 1.0, 2)
+    assert (ebbtide["evidence_kept"], ebbtide["turn_all@5"], ebbtide["memories"]) == (1.0, 1.0, 2)
 
 
 def test_score_matches_the_official_definitions():

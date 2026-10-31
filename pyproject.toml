@@ -1,0 +1,45 @@
+[project]
+name = "ebbtide"
+version = "0.1.0"
+description = "Long-term memory for AI agents that forgets on purpose: an MCP server on a forgetting curve."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Nikhil Pawar" }]
+requires-python = ">=3.12"
+# Pinned: the versions validated on Python 3.12, on Linux and Apple silicon Macs (macOS 14+).
+dependencies = [
+    "torch==2.14.1",
+    "sentence-transformers==6.1.0",
+    "transformers==5.19.0",
+    "numpy==2.4.6",
+    "mcp==2.3.0",
+]
+
+[project.urls]
+Homepage = "https://aimsotrash-engram.vercel.app"
+Repository = "https://github.com/aimsotrash/Ebbtide"
+
+[project.scripts]
+ebbtide = "ebbtide.server:main"
+ebbtide-panel = "ebbtide.panel:main"
+
+# CPU-only PyTorch on Linux and Windows (about 200 MB instead of several GB of CUDA
+# libraries). PyTorch has no CPU index build for macOS, so Macs get the PyPI wheel.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform != 'darwin'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+# ponytail: `intelligence` ships as its own top-level package; fine in uv's isolated tool
+# environments, move it under `ebbtide` if anyone installs this into a shared environment.
+packages = ["ebbtide", "intelligence"]
+exclude = ["*/tests"]
