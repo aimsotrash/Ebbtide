@@ -17,7 +17,7 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://aimsotrash-engram.vercel.app"
+Homepage = "https://aimsotrash-ebbtide.vercel.app"
 Repository = "https://github.com/aimsotrash/Ebbtide"
 
 [project.scripts]
