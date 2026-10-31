@@ -9,7 +9,7 @@ servers for AI agents already use that name. It began as a notes app, which I re
 October 2026; its last version is the git tag
 [`notes-app`](https://github.com/aimsotrash/Ebbtide/tree/notes-app).
 
-**Live:** [aimsotrash-engram.vercel.app](https://aimsotrash-engram.vercel.app)
+**Live:** [aimsotrash-ebbtide.vercel.app](https://aimsotrash-ebbtide.vercel.app)
 
 ## Memory for AI agents
 
