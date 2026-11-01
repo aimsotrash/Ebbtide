@@ -107,3 +107,31 @@ def test_budget_forget_stats_and_guards():
         MemoryStore(POLICIES["lru"], budget=0)
     with pytest.raises(ValueError):
         Policy(evict="oldest")
+
+
+def test_similar_peeks_and_update_corrects_in_place():
+    store = MemoryStore(POLICIES["ebbtide-count"], budget=10)
+    old = store.add("coffee black", X, now=0)
+    store.add("other", Y, now=0)
+    store.recall(X, k=1, now=DAY)  # old earns a little stability
+    earned = old.stability
+
+    close = store.similar([1.0, 0.2], k=3, threshold=0.5)
+    assert [(m.text, round(s, 2)) for m, s in close] == [("coffee black", 0.98)]  # "other" is below 0.5
+    assert old.recall_count == 1  # a look: nothing strengthened
+
+    fixed = store.update(old.id, "coffee with oat milk", [1.0, 0.1], now=5 * DAY)
+    assert fixed is old and old.text == "coffee with oat milk"
+    assert old.stability == earned and old.last_recalled_at == 5 * DAY  # full strength again
+    assert store.update(99, "nothing", X, now=5 * DAY) is None
+
+
+def test_hybrid_recall_lifts_a_keyword_match():
+    store = MemoryStore(POLICIES["keep-all"])
+    store.add("deploys use python 3.12", X, now=0)                       # cosine 1.0
+    store.add("lunch is at noon", [0.9, math.sqrt(1 - 0.81)], now=0)       # cosine 0.9
+    store.add("the staging database is postgres 16", [0.8, 0.6], now=0)  # cosine 0.8, the only keyword match
+    by_vector = [m.text for m, _ in store.recall(X, k=3, now=0, refresh=False)]
+    fused = [m.text for m, _ in store.recall(X, k=3, now=0, refresh=False, query_text="which postgres version")]
+    assert by_vector == ["deploys use python 3.12", "lunch is at noon", "the staging database is postgres 16"]
+    assert fused == ["deploys use python 3.12", "the staging database is postgres 16", "lunch is at noon"]

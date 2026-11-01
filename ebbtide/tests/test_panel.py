@@ -21,6 +21,7 @@ def test_panel_lists_strengths_and_looks_ahead(tmp_path, monkeypatch):
     monkeypatch.delenv("EBBTIDE_POLICY", raising=False)
     monkeypatch.delenv("EBBTIDE_BUDGET", raising=False)
     monkeypatch.setattr(embeddings, "embed_query", lambda text: [text.count("tea"), text.count("cat"), 0.1])
+    monkeypatch.setattr(embeddings, "fits", lambda text: True)
     monkeypatch.setattr(server, "time", SimpleNamespace(time=lambda: clock.now))
     monkeypatch.setattr(panel, "time", SimpleNamespace(time=lambda: clock.now))
     server.remember("Green tea after lunch", tags=["habit"])

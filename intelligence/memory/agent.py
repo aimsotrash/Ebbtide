@@ -23,6 +23,8 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from intelligence.memory.hybrid import bm25, rrf, words
+
 from intelligence.memory.ebbinghaus import _BASE_HOURS, stability
 
 # The "spaced" rule is FSRS-6's stability update after a successful recall,
@@ -122,10 +124,13 @@ class MemoryStore:
         self.memories.append(memory)
         return memory
 
-    def recall(self, query, k: int, now: float, refresh: bool = True) -> list[tuple[Memory, float]]:
+    def recall(self, query, k: int, now: float, refresh: bool = True,
+               query_text: str | None = None) -> list[tuple[Memory, float]]:
         """The k best memories for a query embedding as (memory, score), best first.
-        Each one returned is refreshed, and strengthened if the policy says so, unless
-        `refresh` is False: a look that leaves every memory as it was."""
+        With `query_text`, the policy's ranking is fused with BM25 over the memories'
+        texts (reciprocal rank fusion), and the score is the fused one. Each memory
+        returned is refreshed, and strengthened if the policy says so, unless `refresh`
+        is False: a look that leaves every memory as it was."""
         if not self.memories or k < 1:
             return []
         # ponytail: restacks every embedding per call, O(n·d); keep one growing
@@ -136,13 +141,40 @@ class MemoryStore:
             scores = sims + self.policy.weight * log_r
         else:  # clipped, or a weak memory would climb by shrinking a negative similarity
             scores = np.maximum(sims, 0.0) * np.exp(self.policy.weight * log_r)
+        order = [int(i) for i in np.argsort(-scores, kind="stable")]
+        if query_text is None:
+            ranked = [(i, float(scores[i])) for i in order]
+        else:
+            # ponytail: re-tokenizes every memory per call, fine at the 1000-memory default;
+            # cache tokens on Memory if budgets grow far past that.
+            keyword = bm25(words(query_text), [words(m.text) for m in self.memories])
+            ranked = rrf(order, [int(i) for i in np.argsort(-keyword, kind="stable")])
         hits = []
-        for i in np.argsort(-scores, kind="stable")[:k]:
+        for i, score in ranked[:k]:
             memory = self.memories[i]
             if refresh:
                 self._refresh(memory, math.exp(log_r[i]), now)
-            hits.append((memory, float(scores[i])))
+            hits.append((memory, score))
         return hits
+
+    def similar(self, query, k: int, threshold: float) -> list[tuple[Memory, float]]:
+        """Up to k memories at least `threshold` cosine-similar to an embedding, closest
+        first. A look only: nothing is refreshed or strengthened."""
+        if not self.memories or k < 1:
+            return []
+        sims = np.stack([m.embedding for m in self.memories]) @ _unit(query)
+        return [(self.memories[i], float(sims[i])) for i in np.argsort(-sims, kind="stable")[:k]
+                if sims[i] >= threshold]
+
+    def update(self, memory_id: int, text: str, embedding, now: float) -> Memory | None:
+        """Replace a memory's text, as a correction. It keeps its id and the stability it
+        has earned, and counts as just used, so it starts again at full strength. Returns
+        None if there is no such memory."""
+        for m in self.memories:
+            if m.id == memory_id:
+                m.text, m.embedding, m.last_recalled_at = text, _unit(embedding), now
+                return m
+        return None
 
     def forget(self, memory_id: int) -> bool:
         """Delete a memory by id. Returns whether it was there."""
