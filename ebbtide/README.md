@@ -1,8 +1,9 @@
 # Ebbtide MCP server
 
-Long-term memory for AI agents, served over the Model Context Protocol (stdio). Each
-memory fades along a forgetting curve unless it is recalled, and each recall makes it
-last longer. When the store is full, the weakest memory goes. The memory model and its
+Long-term memory for AI agents, served over the Model Context Protocol (stdio). Recall
+fuses keyword search (BM25) with embedding search. Each memory fades along a forgetting
+curve unless it is recalled, and each recall makes it last longer. When the store is full,
+the weakest memory goes. The memory model and its
 policies live in [`intelligence/memory/agent.py`](../intelligence/memory/agent.py); this
 package adds the tools and SQLite persistence.
 
@@ -10,8 +11,9 @@ package adds the tools and SQLite persistence.
 
 | Tool | What it does |
 |---|---|
-| `remember(text, tags?)` | Stores one memory. Returns its id and the ids of any memories the budget pushed out. |
-| `recall(query, k=5)` | Returns the `k` most relevant memories (at most 20), each with its strength just before this recall. Recalling strengthens a memory. |
+| `remember(text, tags?)` | Stores one memory: one fact, preference, decision or lesson, up to the 256 tokens (about 1,000 characters) the embedding model reads. Returns its id, the ids of any memories the budget pushed out, and up to 3 existing memories with a cosine similarity of 0.5 or more, so the agent can forget an older version. |
+| `recall(query, k=5)` | Returns the `k` most relevant memories (at most 20), ranked by BM25 fused with embedding similarity, each with its strength just before this recall. Recalling strengthens a memory. |
+| `update(id, text)` | Replaces a memory's text when a fact changes. It keeps its id and earned stability, and starts again at full strength. |
 | `forget(id)` | Deletes a memory permanently. |
 | `memory_stats()` | Reports the count, budget, policy, mean strength, and how many memories have ever been stored. |
 
@@ -33,16 +35,16 @@ Reading a resource is not recalling: neither one strengthens a memory.
 
 ## Setup
 
-With [uv](https://docs.astral.sh/uv/), on Linux or an Apple silicon Mac (macOS 14 or later):
+With [uv](https://docs.astral.sh/uv/), on Linux, Windows, or an Apple silicon Mac (macOS 14 or
+later):
 
 ```bash
-uv tool install --torch-backend cpu ebbtide
+uv tool install ebbtide==0.3.0
 claude mcp add ebbtide -s user -- ebbtide
 ```
 
 The first command installs two commands, `ebbtide` and `ebbtide-panel`, from PyPI in an
-isolated environment. `--torch-backend cpu` picks PyTorch's CPU build (about 1.2 GB on disk)
-over several GB of CUDA libraries; Ebbtide doesn't use a GPU. `-s user` makes Ebbtide available in
+isolated environment of about 180 MB. `-s user` makes Ebbtide available in
 every project; without it, Claude Code would use it only in the folder you ran it from. To
 update later, run `uv tool upgrade ebbtide`. To run the latest commit instead of the latest
 release, install `git+https://github.com/aimsotrash/Ebbtide` in place of `ebbtide`.
@@ -54,19 +56,19 @@ Other MCP clients take the same server as a `uvx` command:
   "mcpServers": {
     "ebbtide": {
       "command": "uvx",
-      "args": ["--torch-backend", "cpu", "ebbtide"]
+      "args": ["ebbtide==0.3.0"]
     }
   }
 }
 ```
 
-`uvx` installs on the first launch, which takes a minute or two and can outlast a client's
-startup timeout. Running `uvx --torch-backend cpu ebbtide < /dev/null` once in a terminal
-does that install ahead of time.
+`uvx` installs on the first launch. If that outlasts a client's startup timeout, run
+`uvx ebbtide==0.3.0 < /dev/null` once in a terminal to install ahead of time.
 
-The first `remember` or `recall` in a session takes about 5 seconds while the embedding
-model (`all-MiniLM-L6-v2`) loads, and the very first run also downloads it (~90 MB).
-After that, a call takes about 10 ms.
+The embedding model is `all-MiniLM-L6-v2`, run through ONNX Runtime. The very first
+`remember` or `recall` downloads it (~90 MB) into `~/.cache/ebbtide` and checks it against a
+pinned SHA-256; after that it loads from disk in under a second, and a call takes a few
+milliseconds.
 
 ## Panel
 
@@ -106,6 +108,6 @@ uv venv -p 3.12 .venv && uv pip install --python .venv -r requirements-test.txt
 .venv/bin/python -m pytest ebbtide/tests/
 ```
 
-They call every tool through an in-process MCP client and fetch the panel through its
-HTTP handler, with a stub embedder and a fake clock, so they never load the embedding model or need
-PyTorch.
+They call every tool through an in-process MCP client, run two writers against one database,
+and fetch the panel through its HTTP handler, with a stub embedder and a fake clock, so they
+never load the embedding model.

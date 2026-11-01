@@ -4,6 +4,7 @@ name: CI
 #   - intelligence, MCP server and benchmark pytest  (tests)
 #   - pip-audit                                      (Python dependency security)
 #   - package build                                  (pyproject.toml)
+#   - install + real embedding on Linux, Windows, macOS (platform support)
 #   - landing page (site/) lint / tsc / build        (build validation)
 on:
   push:
@@ -48,6 +49,32 @@ jobs:
         run: |
           pip install pip-audit
           pip-audit --strict --desc
+
+  embed:
+    name: Install and embed (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install the package
+        run: pip install .
+
+      # Outside the checkout, so this is the installed package, not the source tree.
+      - name: Embed with the real model, then start and stop the server
+        working-directory: ${{ runner.temp }}
+        run: |
+          python -c "from intelligence.embeddings import embed_query, fits; v = embed_query('I take my coffee black'); assert len(v) == 384 and abs(sum(x * x for x in v) - 1) < 1e-4 and fits('short'); print('embedding ok')"
+          ebbtide < /dev/null
 
   site:
     name: Landing page lint / typecheck / build

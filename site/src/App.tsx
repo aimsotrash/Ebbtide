@@ -78,8 +78,8 @@ function HowItWorks() {
 // Margin notes for the panel. On a wide screen each one sits level with the part it explains,
 // measured from the panel itself, so the notes follow it when the panel changes.
 const NOTES: { part: Part; side: 'left' | 'right'; name: string; text: string }[] = [
-  { part: 'remember', side: 'left', name: 'remember', text: 'Stores one fact, preference or decision. When memory is full, the weakest one goes first.' },
-  { part: 'recall', side: 'left', name: 'recall', text: 'Finds the memories that fit a question and makes each one last longer. This one has been recalled 4 times.' },
+  { part: 'remember', side: 'left', name: 'remember', text: 'Stores one fact, preference or decision, and points out older ones like it to update or forget. When memory is full, the weakest goes first.' },
+  { part: 'recall', side: 'left', name: 'recall', text: 'Finds the memories that fit a question, by keywords and by meaning, and makes each one last longer. This one has been recalled 4 times.' },
   { part: 'forget', side: 'left', name: 'forget', text: 'Deletes one memory by its id, for good, when your agent calls forget(6). The panel itself only reads.' },
   { part: 'ahead', side: 'right', name: 'Look ahead', text: 'Drag to see how strong each memory will be after more days without a recall.' },
   { part: 'halflife', side: 'right', name: 'Half-life', text: 'Days until a memory falls to half strength: 6.2 when new, and longer after every recall.' },
@@ -139,7 +139,7 @@ function Tools() {
     <section id="tools" aria-labelledby="tools-title" className="px-[var(--margin)] pb-[clamp(96px,12vw,176px)]">
       <div className="mx-auto grid max-w-[1280px] gap-10 min-[1100px]:grid-cols-[1fr_392px_1fr] min-[1100px]:gap-14">
         <div className="relative min-[1100px]:min-h-[var(--panel-h)]" style={tall}>
-          <div ref={headingRef}><Rise><h2 id="tools-title" className={cn(head, 'min-[1100px]:text-right')}>Four tools and a panel</h2></Rise></div>
+          <div ref={headingRef}><Rise><h2 id="tools-title" className={cn(head, 'min-[1100px]:text-right')}>Five tools and a panel</h2></Rise></div>
           <div className="mt-8 grid gap-6 min-[640px]:grid-cols-2 min-[1100px]:mt-0 min-[1100px]:block">{NOTES.filter((n) => n.side === 'left').map(note)}</div>
         </div>
         <Rise delay={0.08} className="flex justify-center">
