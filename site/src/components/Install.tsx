@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 
 // The install dialog, already open: two commands, copied in one press.
 const commands = [
-  'uv tool install --torch-backend cpu ebbtide',
+  'uv tool install ebbtide',
   // -s user: available in every project, not only the folder the command runs in.
   'claude mcp add ebbtide -s user -- ebbtide',
 ].join(' &&\n') // a failed install stops the rest, so a broken server is never registered
@@ -38,7 +38,7 @@ export function Install() {
       <p className="mt-3 text-[13px] text-[#6b6b6b] dark:text-[#a8a8a8]" aria-live="polite">
         {copied === 'yes' ? 'Paste them into a terminal. The first remember or recall downloads a 90 MB model.'
           : copied === 'failed' ? 'The commands are selected: press Ctrl+C, or ⌘C on a Mac, to copy them.'
-          : 'Needs uv and Claude Code, on Linux or an Apple silicon Mac (macOS 14+).'}
+          : 'Needs uv and Claude Code, on Linux, Windows, or an Apple silicon Mac (macOS 14+).'}
       </p>
     </div>
   )
