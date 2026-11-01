@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 
 // The install dialog, already open: two commands, copied in one press.
 const commands = [
-  'uv tool install git+https://github.com/aimsotrash/Ebbtide',
+  'uv tool install --torch-backend cpu ebbtide',
   // -s user: available in every project, not only the folder the command runs in.
   'claude mcp add ebbtide -s user -- ebbtide',
 ].join(' &&\n') // a failed install stops the rest, so a broken server is never registered

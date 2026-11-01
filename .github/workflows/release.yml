@@ -1,0 +1,32 @@
+name: Release
+
+# Pushing a tag like v0.2.0 builds the package and publishes it to PyPI. PyPI trusts this
+# workflow directly (trusted publishing), so no API token is stored anywhere.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  pypi:
+    name: Build and publish to PyPI
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # proves to PyPI that this run is aimsotrash/Ebbtide's release.yml
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Tag matches the package version
+        run: test "${GITHUB_REF_NAME#v}" = "$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
+
+      - name: Build
+        run: |
+          pip install build
+          python -m build
+
+      - uses: pypa/gh-action-pypi-publish@release/v1

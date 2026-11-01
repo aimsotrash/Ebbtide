@@ -43,3 +43,7 @@ build-backend = "hatchling.build"
 # environments, move it under `ebbtide` if anyone installs this into a shared environment.
 packages = ["ebbtide", "intelligence"]
 exclude = ["*/tests"]
+
+[tool.hatch.build.targets.sdist]
+# The code and its tests, not the site, the benchmarks or the data.
+include = ["/ebbtide", "/intelligence", "/README.md", "/LICENSE", "/pyproject.toml"]

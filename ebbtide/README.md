@@ -36,14 +36,16 @@ Reading a resource is not recalling: neither one strengthens a memory.
 With [uv](https://docs.astral.sh/uv/), on Linux or an Apple silicon Mac (macOS 14 or later):
 
 ```bash
-uv tool install git+https://github.com/aimsotrash/Ebbtide
+uv tool install --torch-backend cpu ebbtide
 claude mcp add ebbtide -s user -- ebbtide
 ```
 
-The first command installs two commands, `ebbtide` and `ebbtide-panel`, in an isolated
-environment with CPU-only PyTorch (about 1.2 GB on disk). `-s user` makes Ebbtide available in
+The first command installs two commands, `ebbtide` and `ebbtide-panel`, from PyPI in an
+isolated environment. `--torch-backend cpu` picks PyTorch's CPU build (about 1.2 GB on disk)
+over several GB of CUDA libraries; Ebbtide doesn't use a GPU. `-s user` makes Ebbtide available in
 every project; without it, Claude Code would use it only in the folder you ran it from. To
-update later, run `uv tool upgrade ebbtide`.
+update later, run `uv tool upgrade ebbtide`. To run the latest commit instead of the latest
+release, install `git+https://github.com/aimsotrash/Ebbtide` in place of `ebbtide`.
 
 Other MCP clients take the same server as a `uvx` command:
 
@@ -52,15 +54,15 @@ Other MCP clients take the same server as a `uvx` command:
   "mcpServers": {
     "ebbtide": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/aimsotrash/Ebbtide", "ebbtide"]
+      "args": ["--torch-backend", "cpu", "ebbtide"]
     }
   }
 }
 ```
 
 `uvx` installs on the first launch, which takes a minute or two and can outlast a client's
-startup timeout. Running `uvx --from git+https://github.com/aimsotrash/Ebbtide ebbtide < /dev/null`
-once in a terminal does that install ahead of time.
+startup timeout. Running `uvx --torch-backend cpu ebbtide < /dev/null` once in a terminal
+does that install ahead of time.
 
 The first `remember` or `recall` in a session takes about 5 seconds while the embedding
 model (`all-MiniLM-L6-v2`) loads, and the very first run also downloads it (~90 MB).

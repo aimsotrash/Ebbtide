@@ -18,7 +18,7 @@ With [uv](https://docs.astral.sh/uv/), on Linux or an Apple silicon Mac (macOS 1
 For Claude Code:
 
 ```bash
-uv tool install git+https://github.com/aimsotrash/Ebbtide
+uv tool install --torch-backend cpu ebbtide
 claude mcp add ebbtide -s user -- ebbtide
 ```
 
@@ -29,14 +29,15 @@ For any other MCP client, add this to its configuration:
   "mcpServers": {
     "ebbtide": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/aimsotrash/Ebbtide", "ebbtide"]
+      "args": ["--torch-backend", "cpu", "ebbtide"]
     }
   }
 }
 ```
 
-The first start installs CPU-only PyTorch (about 1.2 GB), and the first `remember` or
-`recall` downloads a 90 MB embedding model; after that, Ebbtide runs offline. Settings and
+`--torch-backend cpu` installs PyTorch's CPU build (about 1.2 GB) instead of several GB of
+CUDA libraries; Ebbtide doesn't use a GPU. The first `remember` or `recall` downloads a 90 MB
+embedding model, and after that Ebbtide runs offline. Settings and
 the memory panel are in [`ebbtide/README.md`](ebbtide/README.md).
 
 ## Memory for AI agents
