@@ -24,8 +24,8 @@ hybrid, as the server's are: the agent's at each user turn and the question's.
 Part 2, the similarity hint. remember returns up to 3 stored memories with a cosine similarity
 of at least 0.5. On LongMemEval's knowledge-update questions (dev and test; nothing was tuned on
 them) the history is replayed with nothing evicted, asking for the hint before each turn is
-stored, as remember does. The hint catches a change if, while a turn of the newest evidence
-session is stored, it names an evidence turn from an older session. Reported at cuts 0.3 to
+stored, as remember does. The hint catches a change if, while the newest evidence turn (the
+evidence in the newest answer session) is stored, it names an evidence turn from an older session. Reported at cuts 0.3 to
 0.7: the share of changes caught, and, as noise, the share of the other user turns that get any
 hint. Turns are whole chat messages, longer and more mixed than the one-fact memories an agent
 is told to store, so this is a proxy, and the cut stays at 0.5 whatever it shows.
@@ -242,14 +242,15 @@ def run() -> None:
         f"`remember` returns up to 3 stored memories with a cosine similarity of at least {SIMILAR}. Replaying "
         f"LongMemEval's knowledge-update histories with nothing evicted, {len(hints)} questions have evidence in an "
         f"older session as well as the newest ({one_session} more keep all their evidence in one session and are "
-        "left out). A change is caught if the hint, while a turn of the newest evidence session is stored, names an "
-        "evidence turn from an older session. Noise is the share of the other "
+        "left out); dev and test are both used, since nothing was tuned on them. A change is caught if the hint, "
+        "while the newest evidence turn is stored, names an evidence turn from an older session. Noise is the share of the other "
         f"{len(others):,} user turns that get any hint.",
         "",
         hint_table,
         "",
-        f"The outdated turn was among the top 3 for {len(best)} of {len(hints)} changes, at a median similarity of "
-        f"{np.median(best):.2f}." if best else "The outdated turn was never among the top 3.",
+        f"An outdated turn was among the top 3 at a similarity of at least {min(CUTS)} for {len(best)} of "
+        f"{len(hints)} changes, at a median similarity of "
+        f"{np.median(best):.2f}." if best else f"No outdated turn was among the top 3 at {min(CUTS)} or more.",
         "",
         "Turns are whole chat messages, often long and about several things, while an agent is told to store one "
         "fact per memory, so this is a proxy. The cut stays where it is.",

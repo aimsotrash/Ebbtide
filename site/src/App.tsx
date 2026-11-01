@@ -157,12 +157,12 @@ function Tools() {
 }
 
 const RESULTS: { value: number; sign?: string; unit?: string; text: string }[] = [
-  { value: 58.5, unit: '%', text: 'of LongMemEval questions have all their evidence in the top 10 results when nothing is forgotten.' },
-  { value: 36.8, unit: '%', text: 'is the best any forgetting rule reaches on LongMemEval with room for half the history.' },
-  { value: 3.9, sign: '+', text: 'points more of the evidence kept than LRU, by strengthening on recall, at half the history.' },
-  { value: 14.0, sign: '+', text: 'points more questions with every answer session in the top 10 than with LRU, by strengthening on recall, at a quarter of the history.' },
-  { value: 17.2, sign: '−', text: 'points on LongMemEval at a quarter or half of the history: when a fact changes, FSRS-style spacing finds the newest version less often than LRU.' },
-  { value: 26.8, unit: '%', text: "is LoCoMo's best at half the history, from keeping the newest. Ebbtide does not beat it there." },
+  { value: 69.8, unit: '%', text: 'of LongMemEval questions have all their evidence in the top 10 results when nothing is forgotten.' },
+  { value: 44.2, unit: '%', text: 'is the best any forgetting rule reaches on LongMemEval with room for half the history: the default, as it ships.' },
+  { value: 5.4, sign: '+', text: 'points more of the evidence kept than LRU, by strengthening on recall, at half the history.' },
+  { value: 10.1, sign: '+', text: 'points more questions with every answer session in the top 10 than with LRU, by strengthening on recall, at a quarter of the history.' },
+  { value: 17.2, sign: '−', text: 'points on LongMemEval at a quarter or half of the history, in the embedding-only replays: when a fact changes, FSRS-style spacing finds the newest version less often than LRU.' },
+  { value: 29.6, unit: '%', text: "is LoCoMo's best at half the history, from keeping the newest. Ebbtide does not beat it there." },
 ]
 
 function Results() {
