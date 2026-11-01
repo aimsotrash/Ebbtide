@@ -1,6 +1,7 @@
 # Ebbtide
 
 [![CI](https://github.com/aimsotrash/Ebbtide/actions/workflows/ci.yml/badge.svg)](https://github.com/aimsotrash/Ebbtide/actions/workflows/ci.yml)
+[![MCP Badge](https://lobehub.com/badge/mcp/aimsotrash-ebbtide)](https://lobehub.com/mcp/aimsotrash-ebbtide)
 
 **Long-term memory for AI agents that forgets on purpose.**
 
@@ -11,18 +12,46 @@ October 2026; its last version is the git tag
 
 **Live:** [aimsotrash-ebbtide.vercel.app](https://aimsotrash-ebbtide.vercel.app)
 
+## Install
+
+With [uv](https://docs.astral.sh/uv/), on Linux or an Apple silicon Mac (macOS 14 or later).
+For Claude Code:
+
+```bash
+uv tool install git+https://github.com/aimsotrash/Ebbtide
+claude mcp add ebbtide -s user -- ebbtide
+```
+
+For any other MCP client, add this to its configuration:
+
+```json
+{
+  "mcpServers": {
+    "ebbtide": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/aimsotrash/Ebbtide", "ebbtide"]
+    }
+  }
+}
+```
+
+The first start installs CPU-only PyTorch (about 1.2 GB), and the first `remember` or
+`recall` downloads a 90 MB embedding model; after that, Ebbtide runs offline. Settings and
+the memory panel are in [`ebbtide/README.md`](ebbtide/README.md).
+
 ## Memory for AI agents
 
 [`ebbtide/`](ebbtide/README.md) is an MCP server that gives an agent such as Claude
 Code long-term memory across sessions, through four tools: `remember`, `recall`, `forget`
-and `memory_stats`. Each memory fades along a forgetting curve unless it is recalled, and
+and `memory_stats`. Two resources, `ebbtide://memories` and `ebbtide://memories/{id}`, let a
+client attach memories as context without strengthening them, and two prompts,
+`recall_first` and `save_session`, start the common workflows. Each memory fades along a forgetting curve unless it is recalled, and
 every recall makes it last longer. When the store reaches its budget, 1000 memories by
 default, the weakest one goes first. The memories live in a SQLite file on your machine,
 and only what a recall returns enters the agent's context.
 
 A local panel lists the memories and how strong each one is, with a slider that looks
-ahead to show which ones are fading. Setup is two commands; see
-[`ebbtide/README.md`](ebbtide/README.md).
+ahead to show which ones are fading.
 
 ### Should an agent forget?
 
@@ -78,7 +107,7 @@ The landing page for the MCP server lives in `site/` (Vite, React and Tailwind):
 cd site && npm install && npm run dev   # http://localhost:5173
 ```
 
-The Python tests (19: 13 intelligence, 2 MCP server, 4 benchmark) stub the embedding model,
+The Python tests (20: 13 intelligence, 3 MCP server, 4 benchmark) stub the embedding model,
 so they need only `requirements-test.txt`, which adds pytest; any venv works, such as the one
 above or a fresh `uv venv -p 3.12 .venv`:
 

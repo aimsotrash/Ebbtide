@@ -15,6 +15,22 @@ package adds the tools and SQLite persistence.
 | `forget(id)` | Deletes a memory permanently. |
 | `memory_stats()` | Reports the count, budget, policy, mean strength, and how many memories have ever been stored. |
 
+## Resources
+
+Reading a resource is not recalling: neither one strengthens a memory.
+
+| Resource | What it holds |
+|---|---|
+| `ebbtide://memories` | Every kept memory, strongest first, with its strength now. |
+| `ebbtide://memories/{id}` | One memory by its id. |
+
+## Prompts
+
+| Prompt | What it asks the agent to do |
+|---|---|
+| `recall_first(question)` | Recall what's relevant before answering the question. |
+| `save_session()` | Store each fact, preference, decision or lesson from the conversation worth keeping. |
+
 ## Setup
 
 With [uv](https://docs.astral.sh/uv/), on Linux or an Apple silicon Mac (macOS 14 or later):
