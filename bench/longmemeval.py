@@ -150,24 +150,29 @@ def plan(q: dict, row: dict[str, int]) -> Plan:
                 max(_timestamp(q["question_date"]), times[-1] + 1))
 
 
-def fill(p: Plan, policy: Policy, budget: int | None, live_k: int, emb: np.ndarray) -> tuple[MemoryStore, float]:
-    """Replay the history into a store. Returns it and the mean ms of the agent's recalls."""
+def fill(p: Plan, policy: Policy, budget: int | None, live_k: int, emb: np.ndarray,
+         texts: list[str] | None = None) -> tuple[MemoryStore, float]:
+    """Replay the history into a store. Returns it and the mean ms of the agent's recalls.
+    With `texts` (indexed like `emb`), memories keep their text and every recall is hybrid,
+    as the server's are; without, recalls rank by embeddings alone."""
     store = MemoryStore(policy, budget)
     recall_seconds, recalls = 0.0, 0
     for i, row in enumerate(p.rows):
         vector = emb[row]
+        text = None if texts is None else texts[row]
         if p.is_user[i]:  # recall before storing, or the turn would find itself
             started = time.perf_counter()
-            store.recall(vector, live_k, p.times[i])
+            store.recall(vector, live_k, p.times[i], query_text=text)
             recall_seconds += time.perf_counter() - started
             recalls += 1
-        store.add("", vector, p.times[i], source={"turn": i})
+        store.add(text or "", vector, p.times[i], source={"turn": i})
     return store, 1000 * recall_seconds / max(recalls, 1)
 
 
-def ask(store: MemoryStore, q: Plan, emb: np.ndarray) -> dict:
+def ask(store: MemoryStore, q: Plan, emb: np.ndarray, texts: list[str] | None = None) -> dict:
     """Score the store's ranking for a question. Only looks: nothing is strengthened."""
-    hits = store.recall(emb[q.question_row], len(store.memories), q.question_time, refresh=False)
+    hits = store.recall(emb[q.question_row], len(store.memories), q.question_time, refresh=False,
+                        query_text=None if texts is None else texts[q.question_row])
     kept = {m.source["turn"] for m in store.memories}
     return {
         **score([m.source["turn"] for m, _ in hits], q),
