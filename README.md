@@ -1,7 +1,7 @@
 # Ebbtide MCP
 
 [![CI](https://github.com/aimsotrash/Ebbtide/actions/workflows/ci.yml/badge.svg)](https://github.com/aimsotrash/Ebbtide/actions/workflows/ci.yml)
-[![MCP Badge](https://lobehub.com/badge/mcp/aimsotrash-ebbtide)](https://lobehub.com/mcp/aimsotrash-ebbtide)
+[![MCP Badge](https://lobehub.com/badge/mcp/aimsotrash-ebbtide?v=0.3.0)](https://lobehub.com/mcp/aimsotrash-ebbtide)
 
 **Local long-term memory for AI agents: hybrid search over what you've told it, with a
 forgetting curve that keeps a bounded store to what keeps mattering.**
