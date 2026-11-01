@@ -1,6 +1,6 @@
 [project]
 name = "ebbtide"
-version = "0.3.0"
+version = "0.3.1"
 description = "Ebbtide MCP: local long-term memory for AI agents, with hybrid search and a forgetting curve."
 readme = "README.md"
 license = "MIT"
