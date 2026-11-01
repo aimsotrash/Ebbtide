@@ -1,7 +1,7 @@
 {
   "identifier": "aimsotrash-ebbtide",
   "name": "Ebbtide MCP",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Local long-term memory for AI agents. Recall fuses keyword search with embedding search, remember points out older versions of a fact, and update corrects them. A forgetting curve keeps a bounded store to what keeps mattering. Runs offline on SQLite, about 180 MB with ONNX Runtime; benchmarked on LongMemEval and LoCoMo.",
   "author": "Nikhil Pawar",
   "authorUrl": "https://github.com/aimsotrash",

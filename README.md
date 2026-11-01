@@ -1,7 +1,7 @@
 # Ebbtide MCP
 
 [![CI](https://github.com/aimsotrash/Ebbtide/actions/workflows/ci.yml/badge.svg)](https://github.com/aimsotrash/Ebbtide/actions/workflows/ci.yml)
-[![MCP Badge](https://lobehub.com/badge/mcp/aimsotrash-ebbtide?v=0.3.0)](https://lobehub.com/mcp/aimsotrash-ebbtide)
+[![MCP Badge](https://lobehub.com/badge/mcp/aimsotrash-ebbtide?v=0.3.1)](https://lobehub.com/mcp/aimsotrash-ebbtide)
 
 **Local long-term memory for AI agents: hybrid search over what you've told it, with a
 forgetting curve that keeps a bounded store to what keeps mattering.**
@@ -19,7 +19,7 @@ With [uv](https://docs.astral.sh/uv/), on Linux, Windows, or an Apple silicon Ma
 later). For Claude Code:
 
 ```bash
-uv tool install ebbtide==0.3.0
+uv tool install ebbtide==0.3.1
 claude mcp add ebbtide -s user -- ebbtide
 ```
 
@@ -30,7 +30,7 @@ For any other MCP client, add this to its configuration:
   "mcpServers": {
     "ebbtide": {
       "command": "uvx",
-      "args": ["ebbtide==0.3.0"]
+      "args": ["ebbtide==0.3.1"]
     }
   }
 }
@@ -39,7 +39,7 @@ For any other MCP client, add this to its configuration:
 The install is about 180 MB: ONNX Runtime rather than PyTorch. The first `remember` or
 `recall` downloads the 90 MB embedding model and checks it against a pinned SHA-256; after
 that, Ebbtide never goes online. The examples pin a version because the project is young; drop
-`==0.3.0` to track the latest. Settings and the memory panel are in
+`==0.3.1` to track the latest. Settings and the memory panel are in
 [`ebbtide/README.md`](ebbtide/README.md).
 
 ## What it does

@@ -39,7 +39,7 @@ With [uv](https://docs.astral.sh/uv/), on Linux, Windows, or an Apple silicon Ma
 later):
 
 ```bash
-uv tool install ebbtide==0.3.0
+uv tool install ebbtide==0.3.1
 claude mcp add ebbtide -s user -- ebbtide
 ```
 
@@ -56,14 +56,14 @@ Other MCP clients take the same server as a `uvx` command:
   "mcpServers": {
     "ebbtide": {
       "command": "uvx",
-      "args": ["ebbtide==0.3.0"]
+      "args": ["ebbtide==0.3.1"]
     }
   }
 }
 ```
 
 `uvx` installs on the first launch. If that outlasts a client's startup timeout, run
-`uvx ebbtide==0.3.0 < /dev/null` once in a terminal to install ahead of time.
+`uvx ebbtide==0.3.1 < /dev/null` once in a terminal to install ahead of time.
 
 The embedding model is `all-MiniLM-L6-v2`, run through ONNX Runtime. The very first
 `remember` or `recall` downloads it (~90 MB) into `~/.cache/ebbtide` and checks it against a
