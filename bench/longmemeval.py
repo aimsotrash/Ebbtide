@@ -85,16 +85,14 @@ def texts(data: list[dict]) -> list[str]:
 
 def embed(all_texts: list[str], out: Path) -> None:
     """Embed every text once into `out`, CHUNK at a time, so an interrupted run resumes."""
-    from intelligence.embeddings import get_model  # heavy: loads torch
-
-    model = get_model()
+    from intelligence.embeddings import encode  # heavy: loads the ONNX model
     parts = out.with_suffix(".parts")
     parts.mkdir(exist_ok=True)
     starts = range(0, len(all_texts), CHUNK)
     for start in starts:
         path = parts / f"{start:07d}.npy"
         if not path.exists():
-            vectors = model.encode(all_texts[start:start + CHUNK], batch_size=64, show_progress_bar=False)
+            vectors = encode(all_texts[start:start + CHUNK], batch_size=64)
             np.save(parts / "partial.npy", vectors.astype(np.float32))
             (parts / "partial.npy").rename(path)
         print(f"embedded {min(start + CHUNK, len(all_texts)):,} / {len(all_texts):,}", flush=True)
