@@ -2,6 +2,7 @@
 database, with a fake clock and a stub embedder, so no model loads."""
 
 import asyncio
+import json
 import sqlite3
 from types import SimpleNamespace
 
@@ -68,3 +69,39 @@ def test_tools_round_trip(tmp_path, monkeypatch):
     ]
     rows = sqlite3.connect(db).execute("SELECT id, round(stability, 1), recall_count FROM memories ORDER BY id").fetchall()
     assert rows == [(1, 1.3, 1), (4, 1.0, 0)]  # one recall: S = 1 + 0.5 ln 2
+
+
+def test_resources_and_prompts(tmp_path, monkeypatch):
+    clock = SimpleNamespace(now=0.0)
+    db = tmp_path / "memory.db"
+    monkeypatch.setenv("EBBTIDE_DB", str(db))
+    monkeypatch.delenv("EBBTIDE_BUDGET", raising=False)
+    monkeypatch.delenv("EBBTIDE_POLICY", raising=False)
+    monkeypatch.setattr(embeddings, "embed_query", _embed)
+    monkeypatch.setattr(server, "time", SimpleNamespace(time=lambda: clock.now))
+
+    async def session():
+        async with Client(server.mcp) as client:
+            await client.call_tool("remember", {"text": "I take my coffee black"})
+            clock.now = 3 * DAY
+            await client.call_tool("remember", {"text": "We deploy with Python 3.12"})
+            listed = await client.read_resource("ebbtide://memories")
+            one = await client.read_resource("ebbtide://memories/1")
+            missing = None
+            try:
+                await client.read_resource("ebbtide://memories/99")
+            except Exception as error:  # the client raises on a resource error
+                missing = error
+            prompts = await client.list_prompts()
+            asked = await client.get_prompt("recall_first", {"question": "How do I take coffee?"})
+            return listed, one, missing, prompts, asked
+
+    listed, one, missing, prompts, asked = asyncio.run(session())
+    rows = json.loads(listed.contents[0].text)
+    assert [r["id"] for r in rows] == [2, 1]  # strongest first: the fresh memory leads
+    assert json.loads(one.contents[0].text)["strength"] == 0.717  # e^(-72 h / 216 h)
+    assert missing is not None
+    # Reading is not recalling: nothing was strengthened.
+    assert sqlite3.connect(db).execute("SELECT sum(recall_count) FROM memories").fetchone() == (0,)
+    assert {p.name for p in prompts.prompts} == {"recall_first", "save_session"}
+    assert "How do I take coffee?" in asked.messages[0].content.text
