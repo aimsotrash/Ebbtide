@@ -112,7 +112,9 @@ def _row(m: Memory, strength: float) -> dict[str, Any]:
 Tag = Annotated[str, Field(max_length=50)]
 Text = Annotated[str, Field(max_length=4000)]
 # ponytail: set from 11 hand-made pairs (changed facts and duplicates scored 0.52-0.93,
-# related but distinct facts 0.24-0.34); tune on real corrections if it misfires.
+# related but distinct facts 0.24-0.34). On LongMemEval's changed facts, whole chat messages
+# rather than one-fact memories, it caught 26% and hinted on 65% of other messages
+# (bench/RESULTS-defaults.md); tune on real corrections if it misfires.
 SIMILAR = 0.5
 
 

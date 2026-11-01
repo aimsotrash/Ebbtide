@@ -71,8 +71,9 @@ budget, the weakest memory goes first.
 
 By the benchmarks below, keeping everything retrieves best when you can afford it. If you'd
 rather never lose a memory, set `EBBTIDE_POLICY=keep-all`; the store then grows without limit.
-The default, `ebbtide-count`, is for a bounded store: of the forgetting rules tested, it kept the
-most of what later questions needed.
+The default, `ebbtide-count`, is for a bounded store: of the forgetting rules tested, it usually
+kept the most of what later questions needed, and it was benchmarked exactly as it ships
+([RESULTS-defaults.md](bench/RESULTS-defaults.md)).
 
 ## Should an agent forget?
 
@@ -90,17 +91,24 @@ nothing was tuned on it.
   ([RESULTS-hybrid.md](bench/RESULTS-hybrid.md)). That is a bigger gain than any forgetting
   rule produced, so the server now ranks this way. It lost ground on preference questions
   (−12.5 points, 24 questions, interval crossing zero).
+- **The default holds up as it ships.** With hybrid search in every recall of the budgeted
+  replays, and ebbtide-count at exactly the server's settings, the default gained 8.2 points
+  [+2.9, +13.2] with room for half of a LongMemEval history, and 2.3 to 5.6 points at every
+  budget on LoCoMo, all with intervals above zero. With less room on LongMemEval the change
+  was −0.8 and +3.2, intervals crossing zero. Preference questions lost again, by 4 to 17
+  points ([RESULTS-defaults.md](bench/RESULTS-defaults.md); rules fixed before the run).
 - **Keeping everything wins when you can afford it.** With room for half the history, the
-  best forgetting policy finds all the evidence in its top 10 results for 37% of LongMemEval
-  questions and 27% of LoCoMo questions. Keeping everything does for 58.5% and 44.6% (with
-  embedding-only ranking).
+  best forgetting policy finds all the evidence in its top 10 results for 44% of LongMemEval
+  questions and 30% of LoCoMo questions. Keeping everything does for 70% and 53%.
 - **No forgetting rule wins everywhere.** On LongMemEval, keeping what gets used beats
-  keeping the newest. On LoCoMo, keeping the newest does best at the turn level.
-- **Strengthening on recall beats plain LRU, modestly.** ebbtide-count keeps up to 4 points
-  more of the evidence than LRU on LongMemEval, and ranks every answer session in its top 10
-  up to 14 points more often; I chose these comparisons after seeing the results. On LoCoMo,
-  where I chose the comparison before running it, both gains held but were smaller (up to 1.6
-  and 3.4 points), and it found all the evidence in its top 10 about as often as LRU.
+  keeping the newest. On LoCoMo, keeping the newest does best at the turn level, except with
+  the smallest budget.
+- **Strengthening on recall beats plain LRU, modestly.** In the hybrid replays, with the
+  comparison named before the run, ebbtide-count kept 3 to 5 points more of the evidence than
+  LRU on LongMemEval with room for a quarter or half the history, and ranked every answer
+  session in its top 10 6 to 10 points more often. On LoCoMo the session gain held (4 to 6
+  points), and the rest was within 3 points. The earlier embedding-only replays pointed the
+  same way.
 - **Strengthening too hard backfires on facts that change.** FSRS-style spacing made old
   facts stick: on LongMemEval's knowledge-update questions it found the newest fact 12 to
   17 points less often than LRU. This is why `update` exists, and why `remember` points out
@@ -122,12 +130,17 @@ new here is the measured comparison with simple baselines, losses included.
   that resembles many queries can stay strong. The benchmarks measured exactly this behavior.
 - **The benchmark agent recalls at every user turn,** five memories at a time. A real agent
   recalls less often, so which memories survive a full store may differ in practice.
-- **Hybrid ranking was measured at question time.** The budgeted replays that decide what is
-  kept used embedding-only recalls.
+- **Hybrid search does worse on preference questions,** such as a recipe request that should
+  recall "I'm vegetarian", where the words rarely match: 12.5 points lower with nothing
+  forgotten, and 4 to 17 lower in the budgeted replays. That is on only 24 questions, so the
+  intervals are wide, but every measurement so far points the same way.
 - **The embedding model is small and reads 256 tokens** (about 1,000 characters), so
   `remember` refuses longer text and asks for one fact per memory. It works best in English.
-- **"Similar" is a heuristic:** a cosine similarity of 0.5 or more, set from a handful of
-  hand-made pairs. Ebbtide never deletes or merges memories by itself.
+- **"Similar" is a rough hint:** a cosine similarity of 0.5 or more. Replayed on LongMemEval's
+  changed facts, it named the outdated message for 26% of them, and 65% of other user messages got
+  a hint too. Those are whole chat messages, not one-fact memories, so this is a proxy, but
+  treat the list as a prompt to check rather than as detection. Ebbtide never deletes or
+  merges memories by itself.
 - **It's young:** renamed on October 31, 2026, with version 0.3.0 the first on ONNX Runtime.
   Pin a version.
 
@@ -147,6 +160,7 @@ uv venv -p 3.12 .venv && uv pip install --python .venv -e .
 .venv/bin/python -m bench.longmemeval run     # writes bench/RESULTS.md
 .venv/bin/python -m bench.locomo              # writes bench/RESULTS-locomo.md
 .venv/bin/python -m bench.hybrid              # writes bench/RESULTS-hybrid.md
+.venv/bin/python -m bench.defaults            # writes bench/RESULTS-defaults.md, ~30 min
 ```
 
 The benchmark embeddings were made with sentence-transformers and PyTorch before Ebbtide moved
